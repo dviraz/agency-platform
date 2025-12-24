@@ -7,10 +7,10 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 
 const navigation = [
-  { name: 'Services', href: '#services' },
-  { name: 'Products', href: '#products' },
-  { name: 'Process', href: '#process' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'Services', href: '/services' },
+  { name: 'Products', href: '/products' },
+  { name: 'About', href: '/about' },
+  { name: 'Contact', href: '/contact' },
 ]
 
 export function Header() {
@@ -53,13 +53,13 @@ export function Header() {
         {/* Desktop navigation */}
         <div className="hidden lg:flex lg:gap-x-8">
           {navigation.map((item) => (
-            <a
+            <Link
               key={item.name}
               href={item.href}
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               {item.name}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -72,7 +72,7 @@ export function Header() {
             asChild
             className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
           >
-            <Link href="#services">Get Started</Link>
+            <Link href="/services">Get Started</Link>
           </Button>
         </div>
       </nav>
@@ -90,14 +90,14 @@ export function Header() {
           >
             <div className="relative space-y-1 bg-background/95 backdrop-blur-xl px-4 pb-4 pt-2 border-b border-white/5">
               {navigation.map((item) => (
-                <a
+                <Link
                   key={item.name}
                   href={item.href}
                   className="block rounded-lg px-3 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-white/5"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.name}
-                </a>
+                </Link>
               ))}
               <div className="pt-4 flex flex-col gap-2">
                 <Button variant="outline" asChild className="w-full">
@@ -107,7 +107,7 @@ export function Header() {
                   asChild
                   className="w-full bg-gradient-to-r from-blue-500 to-purple-600"
                 >
-                  <Link href="#services">Get Started</Link>
+                  <Link href="/services">Get Started</Link>
                 </Button>
               </div>
             </div>
