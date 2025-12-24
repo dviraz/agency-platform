@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# test results
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# test files
+test-supabase.js
