@@ -33,7 +33,7 @@ async function updateOrderStatus(formData: FormData) {
   const supabase = createAdminClient()
   await supabase
     .from('orders')
-    .update({ status, updated_at: new Date().toISOString() })
+    .update({ status: status as any, updated_at: new Date().toISOString() })
     .eq('id', orderId)
 
   revalidatePath('/admin/orders')
