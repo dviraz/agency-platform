@@ -1,9 +1,11 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import React from 'react'
+import { useReducedMotion } from 'framer-motion'
 
 export function BackgroundBeams({ className }: { className?: string }) {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <div
       className={cn(
@@ -39,7 +41,7 @@ export function BackgroundBeams({ className }: { className?: string }) {
             y2="100%"
             stroke="url(#beam-gradient)"
             strokeWidth="1"
-            className="animate-beam"
+            className={shouldReduceMotion ? undefined : 'animate-beam'}
           />
           <line
             x1="100%"
@@ -48,7 +50,7 @@ export function BackgroundBeams({ className }: { className?: string }) {
             y2="100%"
             stroke="url(#beam-gradient)"
             strokeWidth="1"
-            className="animate-beam-reverse"
+            className={shouldReduceMotion ? undefined : 'animate-beam-reverse'}
           />
           <line
             x1="50%"
@@ -57,14 +59,25 @@ export function BackgroundBeams({ className }: { className?: string }) {
             y2="100%"
             stroke="url(#beam-gradient)"
             strokeWidth="0.5"
-            className="animate-beam-slow"
+            className={shouldReduceMotion ? undefined : 'animate-beam-slow'}
           />
         </g>
       </svg>
 
       {/* Radial gradients for glow effect */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      <div
+        className={cn(
+          'absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl',
+          shouldReduceMotion ? undefined : 'animate-pulse'
+        )}
+      />
+      <div
+        className={cn(
+          'absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl',
+          shouldReduceMotion ? undefined : 'animate-pulse'
+        )}
+        style={shouldReduceMotion ? undefined : { animationDelay: '1s' }}
+      />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl" />
 
       <style jsx>{`

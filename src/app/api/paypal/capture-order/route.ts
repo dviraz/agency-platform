@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { capturePayPalOrder } from '@/lib/paypal/config'
 import { sendEmail, getPaymentConfirmationEmail } from '@/lib/email'
+import { PRODUCTS } from '@/lib/constants/products'
+import { SERVICE_TIERS } from '@/lib/constants/services'
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,6 +37,42 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
+    const { data: productRecords } = await supabase
+      .from('products')
+      .select('price_usd')
+      .eq('slug', order.product_id)
+      .limit(1)
+
+    const productRecord = productRecords?.[0]
+    let expectedAmount = productRecord?.price_usd
+
+    if (!expectedAmount) {
+      const product = PRODUCTS.find((item) => item.slug === order.product_id)
+      if (product) {
+        expectedAmount = product.price
+      } else {
+        const tier = SERVICE_TIERS.find((item) => item.slug === order.product_id)
+        if (tier) {
+          expectedAmount = tier.price
+        }
+      }
+    }
+
+    if (expectedAmount && expectedAmount !== order.amount_usd) {
+      await supabase
+        .from('orders')
+        .update({
+          status: 'payment_failed',
+          payment_status: 'amount_mismatch',
+        })
+        .eq('id', orderId)
+
+      return NextResponse.json(
+        { error: 'Order amount mismatch. Please contact support.' },
+        { status: 400 }
+      )
+    }
+
     // Capture the PayPal payment
     const captureData = await capturePayPalOrder(paypalOrderId)
 
@@ -50,6 +88,25 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(
         { error: 'Payment was not completed' },
+        { status: 400 }
+      )
+    }
+
+    const captureAmount = Number(
+      captureData.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value || 0
+    )
+
+    if (Math.abs(captureAmount - order.amount_usd) > 0.01) {
+      await supabase
+        .from('orders')
+        .update({
+          status: 'payment_failed',
+          payment_status: 'amount_mismatch',
+        })
+        .eq('id', orderId)
+
+      return NextResponse.json(
+        { error: 'Payment amount mismatch. Please contact support.' },
         { status: 400 }
       )
     }

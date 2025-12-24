@@ -8,7 +8,10 @@ const inter = Inter({
   variable: '--font-inter',
 })
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: 'Agency | Premium Digital Marketing Services',
     template: '%s | Agency',
@@ -29,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: process.env.NEXT_PUBLIC_APP_URL,
+    url: siteUrl,
     siteName: 'Agency',
     title: 'Agency | Premium Digital Marketing Services',
     description:
@@ -44,6 +47,9 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  alternates: {
+    canonical: '/',
   },
 }
 

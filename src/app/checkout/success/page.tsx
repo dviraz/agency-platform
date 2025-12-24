@@ -3,7 +3,7 @@
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { CheckCircle, ArrowRight, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { BackgroundBeams } from '@/components/aceternity/background-beams'
@@ -11,6 +11,7 @@ import { BackgroundBeams } from '@/components/aceternity/background-beams'
 function SuccessContent() {
   const searchParams = useSearchParams()
   const orderId = searchParams.get('orderId')
+  const shouldReduceMotion = useReducedMotion()
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -22,9 +23,9 @@ function SuccessContent() {
 
       <div className="relative z-10 max-w-lg mx-auto px-6 text-center">
         <motion.div
-          initial={{ scale: 0 }}
+          initial={shouldReduceMotion ? { scale: 1 } : { scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: 'spring', duration: 0.5 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', duration: 0.5 }}
           className="mb-8"
         >
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-500/20 mb-6">
@@ -33,9 +34,9 @@ function SuccessContent() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { delay: 0.2 }}
         >
           <h1 className="text-3xl font-bold mb-4">Payment Successful!</h1>
           <p className="text-muted-foreground mb-8">

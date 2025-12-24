@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 export function BentoGrid({
   className,
@@ -35,10 +35,12 @@ export function BentoGridItem({
   header?: React.ReactNode
   icon?: React.ReactNode
 }) {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.2 }}
+      whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+      transition={shouldReduceMotion ? undefined : { duration: 0.2 }}
       className={cn(
         'row-span-1 rounded-xl group/bento hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-4 bg-card border border-white/10 justify-between flex flex-col space-y-4 overflow-hidden',
         className

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Check, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -9,6 +9,8 @@ import { SERVICE_TIERS } from '@/lib/constants/services'
 import { SpotlightCard } from '@/components/aceternity/spotlight'
 
 export function ServiceTiers() {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <section id="services" className="relative py-24 sm:py-32">
       {/* Background gradient */}
@@ -17,10 +19,10 @@ export function ServiceTiers() {
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={shouldReduceMotion ? undefined : { once: true }}
+          transition={shouldReduceMotion ? undefined : { duration: 0.5 }}
           className="mx-auto max-w-2xl text-center"
         >
           <h2 className="text-base font-semibold text-cyan-400">Pricing</h2>
@@ -37,10 +39,10 @@ export function ServiceTiers() {
           {SERVICE_TIERS.map((tier, index) => (
             <motion.div
               key={tier.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+              whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+              viewport={shouldReduceMotion ? undefined : { once: true }}
+              transition={shouldReduceMotion ? undefined : { duration: 0.5, delay: index * 0.1 }}
             >
               <SpotlightCard
                 className={cn(
@@ -103,10 +105,10 @@ export function ServiceTiers() {
 
         {/* Enterprise note */}
         <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          initial={shouldReduceMotion ? false : { opacity: 0 }}
+          whileInView={shouldReduceMotion ? undefined : { opacity: 1 }}
+          viewport={shouldReduceMotion ? undefined : { once: true }}
+          transition={shouldReduceMotion ? undefined : { duration: 0.5, delay: 0.4 }}
           className="mt-12 text-center text-sm text-muted-foreground"
         >
           Need a custom solution?{' '}

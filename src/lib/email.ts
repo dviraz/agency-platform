@@ -57,7 +57,7 @@ export function getPaymentConfirmationEmail(data: {
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0a0a0a; color: #fafafa; padding: 40px 20px;">
           <div style="max-width: 600px; margin: 0 auto; background-color: #171717; border-radius: 12px; padding: 40px; border: 1px solid rgba(255,255,255,0.1);">
-            <h1 style="color: #fafafa; font-size: 24px; margin-bottom: 20px;">Payment Confirmed! 🎉</h1>
+            <h1 style="color: #fafafa; font-size: 24px; margin-bottom: 20px;">Payment Confirmed!</h1>
 
             <p style="color: #a1a1aa; font-size: 16px; line-height: 1.6;">
               Hi ${customerName},

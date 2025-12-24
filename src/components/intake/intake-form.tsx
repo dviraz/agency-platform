@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -67,6 +67,7 @@ interface IntakeFormProps {
 export function IntakeForm({ orderId, initialData, initialStep = 1 }: IntakeFormProps) {
   const router = useRouter()
   const supabase = createClient()
+  const shouldReduceMotion = useReducedMotion()
   const [currentStep, setCurrentStep] = useState(initialStep)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -241,10 +242,10 @@ export function IntakeForm({ orderId, initialData, initialStep = 1 }: IntakeForm
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
+              initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
+              exit={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
             >
               {/* Step 1: Business Info */}
               {currentStep === 1 && (
@@ -255,45 +256,89 @@ export function IntakeForm({ orderId, initialData, initialStep = 1 }: IntakeForm
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="business_name">Business Name *</Label>
-                      <Input {...register('business_name')} placeholder="Acme Inc." />
+                      <Input
+                        id="business_name"
+                        {...register('business_name')}
+                        placeholder="Acme Inc."
+                        aria-describedby={errors.business_name ? 'business_name-error' : undefined}
+                        aria-invalid={!!errors.business_name}
+                      />
                       {errors.business_name && (
-                        <p className="text-sm text-destructive">{errors.business_name.message}</p>
+                        <p id="business_name-error" className="text-sm text-destructive">
+                          {errors.business_name.message}
+                        </p>
                       )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="industry">Industry *</Label>
-                      <Input {...register('industry')} placeholder="Technology, Healthcare, etc." />
+                      <Input
+                        id="industry"
+                        {...register('industry')}
+                        placeholder="Technology, Healthcare, etc."
+                        aria-describedby={errors.industry ? 'industry-error' : undefined}
+                        aria-invalid={!!errors.industry}
+                      />
                       {errors.industry && (
-                        <p className="text-sm text-destructive">{errors.industry.message}</p>
+                        <p id="industry-error" className="text-sm text-destructive">
+                          {errors.industry.message}
+                        </p>
                       )}
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="website_url">Website URL (optional)</Label>
-                    <Input {...register('website_url')} placeholder="https://example.com" />
+                    <Input
+                      id="website_url"
+                      {...register('website_url')}
+                      placeholder="https://example.com"
+                      aria-describedby={errors.website_url ? 'website_url-error' : undefined}
+                      aria-invalid={!!errors.website_url}
+                    />
+                    {errors.website_url && (
+                      <p id="website_url-error" className="text-sm text-destructive">
+                        {errors.website_url.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="contact_person">Contact Person *</Label>
-                      <Input {...register('contact_person')} placeholder="John Doe" />
+                      <Input
+                        id="contact_person"
+                        {...register('contact_person')}
+                        placeholder="John Doe"
+                        aria-describedby={errors.contact_person ? 'contact_person-error' : undefined}
+                        aria-invalid={!!errors.contact_person}
+                      />
                       {errors.contact_person && (
-                        <p className="text-sm text-destructive">{errors.contact_person.message}</p>
+                        <p id="contact_person-error" className="text-sm text-destructive">
+                          {errors.contact_person.message}
+                        </p>
                       )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="contact_email">Email *</Label>
-                      <Input {...register('contact_email')} type="email" placeholder="john@example.com" />
+                      <Input
+                        id="contact_email"
+                        {...register('contact_email')}
+                        type="email"
+                        placeholder="john@example.com"
+                        aria-describedby={errors.contact_email ? 'contact_email-error' : undefined}
+                        aria-invalid={!!errors.contact_email}
+                      />
                       {errors.contact_email && (
-                        <p className="text-sm text-destructive">{errors.contact_email.message}</p>
+                        <p id="contact_email-error" className="text-sm text-destructive">
+                          {errors.contact_email.message}
+                        </p>
                       )}
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="contact_phone">Phone (optional)</Label>
-                    <Input {...register('contact_phone')} placeholder="+1 (234) 567-890" />
+                    <Input id="contact_phone" {...register('contact_phone')} placeholder="+1 (234) 567-890" />
                   </div>
                 </div>
               )}
@@ -307,24 +352,34 @@ export function IntakeForm({ orderId, initialData, initialStep = 1 }: IntakeForm
                   <div className="space-y-2">
                     <Label htmlFor="project_goals">Project Goals *</Label>
                     <Textarea
+                      id="project_goals"
                       {...register('project_goals')}
                       placeholder="What do you want to achieve with this project?"
                       rows={4}
+                      aria-describedby={errors.project_goals ? 'project_goals-error' : undefined}
+                      aria-invalid={!!errors.project_goals}
                     />
                     {errors.project_goals && (
-                      <p className="text-sm text-destructive">{errors.project_goals.message}</p>
+                      <p id="project_goals-error" className="text-sm text-destructive">
+                        {errors.project_goals.message}
+                      </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="project_description">Project Description *</Label>
                     <Textarea
+                      id="project_description"
                       {...register('project_description')}
                       placeholder="Describe your project in detail..."
                       rows={6}
+                      aria-describedby={errors.project_description ? 'project_description-error' : undefined}
+                      aria-invalid={!!errors.project_description}
                     />
                     {errors.project_description && (
-                      <p className="text-sm text-destructive">{errors.project_description.message}</p>
+                      <p id="project_description-error" className="text-sm text-destructive">
+                        {errors.project_description.message}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -339,29 +394,35 @@ export function IntakeForm({ orderId, initialData, initialStep = 1 }: IntakeForm
                   <div className="space-y-2">
                     <Label htmlFor="target_audience">Target Audience *</Label>
                     <Textarea
+                      id="target_audience"
                       {...register('target_audience')}
                       placeholder="Describe your ideal customers..."
                       rows={4}
+                      aria-describedby={errors.target_audience ? 'target_audience-error' : undefined}
+                      aria-invalid={!!errors.target_audience}
                     />
                     {errors.target_audience && (
-                      <p className="text-sm text-destructive">{errors.target_audience.message}</p>
+                      <p id="target_audience-error" className="text-sm text-destructive">
+                        {errors.target_audience.message}
+                      </p>
                     )}
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="geographic_focus">Geographic Focus</Label>
-                      <Input {...register('geographic_focus')} placeholder="Local, National, Global" />
+                      <Input id="geographic_focus" {...register('geographic_focus')} placeholder="Local, National, Global" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="age_range">Age Range</Label>
-                      <Input {...register('age_range')} placeholder="25-45" />
+                      <Input id="age_range" {...register('age_range')} placeholder="25-45" />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="customer_pain_points">Customer Pain Points</Label>
                     <Textarea
+                      id="customer_pain_points"
                       {...register('customer_pain_points')}
                       placeholder="What problems do your customers face?"
                       rows={4}
@@ -379,22 +440,23 @@ export function IntakeForm({ orderId, initialData, initialStep = 1 }: IntakeForm
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="desired_start_date">Desired Start Date</Label>
-                      <Input {...register('desired_start_date')} type="date" />
+                      <Input id="desired_start_date" {...register('desired_start_date')} type="date" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="deadline">Deadline</Label>
-                      <Input {...register('deadline')} type="date" />
+                      <Input id="deadline" {...register('deadline')} type="date" />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="budget_expectations">Budget Expectations</Label>
-                    <Input {...register('budget_expectations')} placeholder="What's your monthly marketing budget?" />
+                    <Input id="budget_expectations" {...register('budget_expectations')} placeholder="What's your monthly marketing budget?" />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="additional_notes">Additional Notes</Label>
                     <Textarea
+                      id="additional_notes"
                       {...register('additional_notes')}
                       placeholder="Anything else we should know?"
                       rows={4}
@@ -413,10 +475,10 @@ export function IntakeForm({ orderId, initialData, initialStep = 1 }: IntakeForm
                     <div className="bg-white/5 rounded-lg p-4">
                       <h3 className="font-medium mb-2">Business Info</h3>
                       <p className="text-sm text-muted-foreground">
-                        {formData.business_name} • {formData.industry}
+                        {formData.business_name} - {formData.industry}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {formData.contact_person} • {formData.contact_email}
+                        {formData.contact_person} - {formData.contact_email}
                       </p>
                     </div>
 
@@ -435,7 +497,7 @@ export function IntakeForm({ orderId, initialData, initialStep = 1 }: IntakeForm
                         <h3 className="font-medium mb-2">Timeline</h3>
                         <p className="text-sm text-muted-foreground">
                           {formData.desired_start_date && `Start: ${formData.desired_start_date}`}
-                          {formData.desired_start_date && formData.deadline && ' • '}
+                          {formData.desired_start_date && formData.deadline && ' - '}
                           {formData.deadline && `Deadline: ${formData.deadline}`}
                         </p>
                       </div>

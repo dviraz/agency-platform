@@ -2,10 +2,9 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Menu, X, ChevronDown } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { Menu, X } from 'lucide-react'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 
 const navigation = [
   { name: 'Services', href: '#services' },
@@ -16,6 +15,7 @@ const navigation = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const shouldReduceMotion = useReducedMotion()
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
@@ -38,6 +38,8 @@ export function Header() {
             type="button"
             className="inline-flex items-center justify-center rounded-lg p-2 text-muted-foreground hover:text-foreground"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             <span className="sr-only">Open main menu</span>
             {mobileMenuOpen ? (
@@ -79,10 +81,12 @@ export function Header() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
+            exit={shouldReduceMotion ? { opacity: 0, height: 'auto' } : { opacity: 0, height: 0 }}
+            transition={shouldReduceMotion ? { duration: 0 } : undefined}
             className="lg:hidden"
+            id="mobile-menu"
           >
             <div className="relative space-y-1 bg-background/95 backdrop-blur-xl px-4 pb-4 pt-2 border-b border-white/5">
               {navigation.map((item) => (

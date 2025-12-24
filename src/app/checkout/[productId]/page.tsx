@@ -1,6 +1,4 @@
-'use client'
-
-import { useParams } from 'next/navigation'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowLeft, Check, Shield, Clock, Headphones } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -9,37 +7,59 @@ import { PRODUCTS } from '@/lib/constants/products'
 import { SERVICE_TIERS } from '@/lib/constants/services'
 import { BackgroundBeams } from '@/components/aceternity/background-beams'
 
-export default function CheckoutPage() {
-  const params = useParams()
-  const productSlug = params.productId as string
+type CheckoutProductData = {
+  name: string
+  price: number
+  description: string
+  features: readonly string[] | string[]
+}
 
-  // Find product (check both products and service tiers)
+function getProductData(productSlug: string): CheckoutProductData | null {
   let product = PRODUCTS.find((p) => p.slug === productSlug)
-  let productData: {
-    name: string
-    price: number
-    description: string
-    features: readonly string[] | string[]
-  } | null = null
 
   if (product) {
-    productData = {
+    return {
       name: product.name,
       price: product.price,
       description: product.description,
       features: product.features,
     }
-  } else {
-    const tier = SERVICE_TIERS.find((t) => t.slug === productSlug)
-    if (tier) {
-      productData = {
-        name: tier.name,
-        price: tier.price,
-        description: tier.description,
-        features: tier.features,
-      }
+  }
+
+  const tier = SERVICE_TIERS.find((t) => t.slug === productSlug)
+  if (tier) {
+    return {
+      name: tier.name,
+      price: tier.price,
+      description: tier.description,
+      features: tier.features,
     }
   }
+
+  return null
+}
+
+export function generateMetadata({ params }: { params: { productId: string } }): Metadata {
+  const productData = getProductData(params.productId)
+
+  if (!productData) {
+    return {
+      title: 'Checkout',
+      description: 'Complete your purchase.',
+    }
+  }
+
+  return {
+    title: `Checkout | ${productData.name}`,
+    description: `Complete your purchase for ${productData.name}.`,
+  }
+}
+
+export default function CheckoutPage({ params }: { params: { productId: string } }) {
+  const productSlug = params.productId
+
+  // Find product (check both products and service tiers)
+  const productData = getProductData(productSlug)
 
   if (!productData) {
     return (
@@ -140,11 +160,11 @@ export default function CheckoutPage() {
 
               <p className="text-xs text-muted-foreground text-center">
                 By completing this purchase, you agree to our{' '}
-                <Link href="#" className="underline">
+                <Link href="/legal/terms" className="underline">
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link href="#" className="underline">
+                <Link href="/legal/privacy" className="underline">
                   Privacy Policy
                 </Link>
                 .

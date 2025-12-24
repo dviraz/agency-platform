@@ -80,7 +80,11 @@ export default async function DashboardLayout({
           <div className="flex items-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                <Button
+                  variant="ghost"
+                  className="relative h-10 w-10 rounded-full"
+                  aria-label="Open user menu"
+                >
                   <Avatar className="h-10 w-10">
                     <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
                       {initials}
@@ -115,7 +119,7 @@ export default async function DashboardLayout({
             {/* Mobile menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" aria-label="Open navigation menu">
                   <Menu className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>

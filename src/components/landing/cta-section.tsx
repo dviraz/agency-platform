@@ -1,21 +1,23 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Mail, Phone, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MovingBorder } from '@/components/aceternity/moving-border'
 
 export function CTASection() {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <section id="contact" className="relative py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+            whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+            viewport={shouldReduceMotion ? undefined : { once: true }}
+            transition={shouldReduceMotion ? undefined : { duration: 0.5 }}
           >
             <MovingBorder
               containerClassName="rounded-3xl"

@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { useReducedMotion } from 'framer-motion'
 
 interface MeteorsProps {
   number?: number
@@ -8,6 +9,12 @@ interface MeteorsProps {
 }
 
 export function Meteors({ number = 20, className }: MeteorsProps) {
+  const shouldReduceMotion = useReducedMotion()
+
+  if (shouldReduceMotion) {
+    return null
+  }
+
   const meteors = new Array(number).fill(true)
 
   return (

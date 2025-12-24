@@ -105,7 +105,7 @@ test.describe('Agency Platform UI/UX Tests', () => {
       fullPage: true
     });
     
-    await expect(page.locator('h1:has-text("Payment Successful")')).toBeVisible();
+    await expect(page.locator('h1:has-text("Payment Successful!")')).toBeVisible();
     
     console.log('✓ Checkout success page rendered successfully');
   });

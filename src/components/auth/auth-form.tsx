@@ -113,11 +113,15 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
                 id="fullName"
                 placeholder="John Doe"
                 className="pl-10"
+                aria-describedby={(errors as any).fullName ? 'fullName-error' : undefined}
+                aria-invalid={!!(errors as any).fullName}
                 {...register('fullName' as keyof (LoginFormData | SignupFormData))}
               />
             </div>
             {(errors as any).fullName && (
-              <p className="text-sm text-destructive">{(errors as any).fullName.message}</p>
+              <p id="fullName-error" className="text-sm text-destructive">
+                {(errors as any).fullName.message}
+              </p>
             )}
           </div>
         )}
@@ -131,11 +135,15 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
               type="email"
               placeholder="you@example.com"
               className="pl-10"
+              aria-describedby={errors.email ? 'email-error' : undefined}
+              aria-invalid={!!errors.email}
               {...register('email')}
             />
           </div>
           {errors.email && (
-            <p className="text-sm text-destructive">{errors.email.message}</p>
+            <p id="email-error" className="text-sm text-destructive">
+              {errors.email.message}
+            </p>
           )}
         </div>
 
@@ -146,15 +154,26 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
             <Input
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder="Enter your password"
               className="pl-10"
+              aria-describedby={errors.password ? 'password-error' : undefined}
+              aria-invalid={!!errors.password}
               {...register('password')}
             />
           </div>
           {errors.password && (
-            <p className="text-sm text-destructive">{errors.password.message}</p>
+            <p id="password-error" className="text-sm text-destructive">
+              {errors.password.message}
+            </p>
           )}
         </div>
+        {isLogin && (
+          <div className="text-right text-sm">
+            <Link href="/auth/forgot-password" className="text-primary hover:underline">
+              Forgot your password?
+            </Link>
+          </div>
+        )}
 
         {!isLogin && (
           <div className="space-y-2">
@@ -164,13 +183,15 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="••••••••"
+                placeholder="Confirm your password"
                 className="pl-10"
+                aria-describedby={(errors as any).confirmPassword ? 'confirmPassword-error' : undefined}
+                aria-invalid={!!(errors as any).confirmPassword}
                 {...register('confirmPassword' as keyof (LoginFormData | SignupFormData))}
               />
             </div>
             {(errors as any).confirmPassword && (
-              <p className="text-sm text-destructive">
+              <p id="confirmPassword-error" className="text-sm text-destructive">
                 {(errors as any).confirmPassword.message}
               </p>
             )}
@@ -207,3 +228,4 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
     </div>
   )
 }
+

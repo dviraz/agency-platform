@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { CreditCard, FileText, Rocket, BarChart3 } from 'lucide-react'
 
 const steps = [
@@ -35,6 +35,8 @@ const steps = [
 ]
 
 export function ProcessSection() {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <section id="process" className="relative py-24 sm:py-32 overflow-hidden">
       {/* Background */}
@@ -43,10 +45,10 @@ export function ProcessSection() {
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={shouldReduceMotion ? undefined : { once: true }}
+          transition={shouldReduceMotion ? undefined : { duration: 0.5 }}
           className="mx-auto max-w-2xl text-center"
         >
           <h2 className="text-base font-semibold text-cyan-400">How It Works</h2>
@@ -64,10 +66,10 @@ export function ProcessSection() {
             {steps.map((step, index) => (
               <motion.div
                 key={step.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+                whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+                viewport={shouldReduceMotion ? undefined : { once: true }}
+                transition={shouldReduceMotion ? undefined : { duration: 0.5, delay: index * 0.1 }}
                 className="relative"
               >
                 {/* Connector line */}

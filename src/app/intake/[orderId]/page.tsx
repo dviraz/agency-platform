@@ -1,12 +1,15 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { IntakeForm } from '@/components/intake/intake-form'
 import { BackgroundBeams } from '@/components/aceternity/background-beams'
 
-export const metadata = {
-  title: 'Complete Your Intake Form',
-  description: 'Fill out the intake form to get started with your project',
+export function generateMetadata({ params }: { params: { orderId: string } }): Metadata {
+  return {
+    title: `Intake Form | Order ${params.orderId}`,
+    description: 'Fill out the intake form to get started with your project.',
+  }
 }
 
 export default async function IntakePage({

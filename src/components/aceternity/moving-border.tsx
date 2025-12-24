@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 export function MovingBorder({
@@ -21,6 +21,8 @@ export function MovingBorder({
   as?: React.ElementType
   [key: string]: unknown
 }) {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <Component
       className={cn(
@@ -33,21 +35,34 @@ export function MovingBorder({
         className="absolute inset-0"
         style={{ borderRadius: 'inherit' }}
       >
-        <motion.div
-          initial={{ rotate: 0 }}
-          animate={{ rotate: 360 }}
-          transition={{
-            duration: duration / 1000,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-          style={{
-            position: 'absolute',
-            inset: '-200%',
-            background: `conic-gradient(from 0deg, transparent, #3b82f6, #8b5cf6, #22d3ee, transparent)`,
-          }}
-          className={cn(borderClassName)}
-        />
+        {shouldReduceMotion ? (
+          <div
+            style={{
+              position: 'absolute',
+              inset: '-200%',
+              background:
+                'conic-gradient(from 0deg, transparent, #3b82f6, #8b5cf6, #22d3ee, transparent)',
+            }}
+            className={cn(borderClassName)}
+          />
+        ) : (
+          <motion.div
+            initial={{ rotate: 0 }}
+            animate={{ rotate: 360 }}
+            transition={{
+              duration: duration / 1000,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+            style={{
+              position: 'absolute',
+              inset: '-200%',
+              background:
+                'conic-gradient(from 0deg, transparent, #3b82f6, #8b5cf6, #22d3ee, transparent)',
+            }}
+            className={cn(borderClassName)}
+          />
+        )}
       </div>
 
       <div

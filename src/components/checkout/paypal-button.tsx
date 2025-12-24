@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef } from 'react'
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -11,6 +12,7 @@ interface PayPalButtonProps {
 
 export function PayPalButton({ productSlug, onSuccess }: PayPalButtonProps) {
   const router = useRouter()
+  const orderIdRef = useRef<string | null>(null)
 
   const createOrder = async () => {
     try {
@@ -28,6 +30,8 @@ export function PayPalButton({ productSlug, onSuccess }: PayPalButtonProps) {
         throw new Error(data.error || 'Failed to create order')
       }
 
+      orderIdRef.current = data.orderId
+
       return data.paypalOrderId
     } catch (error: any) {
       toast.error(error.message || 'Failed to create order')
@@ -37,6 +41,10 @@ export function PayPalButton({ productSlug, onSuccess }: PayPalButtonProps) {
 
   const onApprove = async (data: any) => {
     try {
+      if (!orderIdRef.current) {
+        throw new Error('Order ID missing. Please try again.')
+      }
+
       const response = await fetch('/api/paypal/capture-order', {
         method: 'POST',
         headers: {
@@ -44,7 +52,7 @@ export function PayPalButton({ productSlug, onSuccess }: PayPalButtonProps) {
         },
         body: JSON.stringify({
           paypalOrderId: data.orderID,
-          orderId: data.orderID, // This should be our internal order ID
+          orderId: orderIdRef.current,
         }),
       })
 

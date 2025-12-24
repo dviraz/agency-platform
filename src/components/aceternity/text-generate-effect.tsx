@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { motion, stagger, useAnimate } from 'framer-motion'
+import { motion, stagger, useAnimate, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 export function TextGenerateEffect({
@@ -16,9 +16,14 @@ export function TextGenerateEffect({
   duration?: number
 }) {
   const [scope, animate] = useAnimate()
+  const shouldReduceMotion = useReducedMotion()
   const wordsArray = words.split(' ')
 
   useEffect(() => {
+    if (shouldReduceMotion) {
+      return
+    }
+
     animate(
       'span',
       {
@@ -30,7 +35,7 @@ export function TextGenerateEffect({
         delay: stagger(0.1),
       }
     )
-  }, [scope, animate, filter, duration])
+  }, [scope, animate, filter, duration, shouldReduceMotion])
 
   const renderWords = () => {
     return (
@@ -56,7 +61,7 @@ export function TextGenerateEffect({
     <div className={cn('font-bold', className)}>
       <div className="mt-4">
         <div className="leading-snug tracking-wide">
-          {renderWords()}
+          {shouldReduceMotion ? words : renderWords()}
         </div>
       </div>
     </div>

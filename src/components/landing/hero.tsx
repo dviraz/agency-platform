@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Spotlight } from '@/components/aceternity/spotlight'
@@ -9,6 +9,17 @@ import { BackgroundBeams } from '@/components/aceternity/background-beams'
 import { TextGenerateEffect } from '@/components/aceternity/text-generate-effect'
 
 export function Hero() {
+  const shouldReduceMotion = useReducedMotion()
+
+  const fadeUp = (delay = 0) =>
+    shouldReduceMotion
+      ? {}
+      : {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.5, delay },
+        }
+
   return (
     <Spotlight className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Background effects */}
@@ -22,9 +33,7 @@ export function Hero() {
         <div className="mx-auto max-w-3xl text-center">
           {/* Badge */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            {...fadeUp(0)}
             className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm backdrop-blur-sm"
           >
             <Sparkles className="h-4 w-4 text-cyan-400" />
@@ -33,9 +42,7 @@ export function Hero() {
 
           {/* Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            {...fadeUp(0.1)}
             className="text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
           >
             <span className="block">Transform Your</span>
@@ -44,9 +51,7 @@ export function Hero() {
 
           {/* Subheadline with text generate effect */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            {...fadeUp(0.2)}
             className="mt-6 text-lg leading-8 text-muted-foreground max-w-2xl mx-auto"
           >
             <TextGenerateEffect
@@ -57,9 +62,7 @@ export function Hero() {
 
           {/* CTA Buttons */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            {...fadeUp(0.4)}
             className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <Button
@@ -84,9 +87,7 @@ export function Hero() {
 
           {/* Stats */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
+            {...fadeUp(0.5)}
             className="mt-16 grid grid-cols-3 gap-8 border-t border-white/5 pt-10"
           >
             {[

@@ -21,16 +21,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Product slug is required' }, { status: 400 })
     }
 
-    // Find product (check both products and service tiers)
-    let product = PRODUCTS.find((p) => p.slug === productSlug)
+    // Find product (prefer database, fallback to local constants/service tiers)
     let productData: { name: string; price: number; slug: string } | undefined
 
-    if (product) {
-      productData = { name: product.name, price: product.price, slug: product.slug }
-    } else {
-      const tier = SERVICE_TIERS.find((t) => t.slug === productSlug)
-      if (tier) {
-        productData = { name: tier.name, price: tier.price, slug: tier.slug }
+    const { data: productRecords } = await supabase
+      .from('products')
+      .select('name, price_usd, slug, is_active')
+      .eq('slug', productSlug)
+      .eq('is_active', true)
+      .limit(1)
+
+    const productRecord = productRecords?.[0]
+
+    if (productRecord) {
+      productData = {
+        name: productRecord.name,
+        price: productRecord.price_usd,
+        slug: productRecord.slug,
+      }
+    }
+
+    if (!productData) {
+      let product = PRODUCTS.find((p) => p.slug === productSlug)
+
+      if (product) {
+        productData = { name: product.name, price: product.price, slug: product.slug }
+      } else {
+        const tier = SERVICE_TIERS.find((t) => t.slug === productSlug)
+        if (tier) {
+          productData = { name: tier.name, price: tier.price, slug: tier.slug }
+        }
       }
     }
 

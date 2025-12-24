@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import {
   Megaphone,
   Search,
@@ -11,7 +11,7 @@ import {
   ArrowRight,
 } from 'lucide-react'
 import { BentoGrid, BentoGridItem } from '@/components/aceternity/bento-grid'
-import { PRODUCTS, PRODUCT_CATEGORIES, ProductCategory } from '@/lib/constants/products'
+import { PRODUCTS, ProductCategory } from '@/lib/constants/products'
 
 const categoryIcons: Record<ProductCategory, React.ReactNode> = {
   service_tier: <Code className="h-5 w-5 text-cyan-400" />,
@@ -47,20 +47,22 @@ const featuredProducts = [
 ]
 
 export function ProductsGrid() {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <section id="products" className="relative py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={shouldReduceMotion ? undefined : { once: true }}
+          transition={shouldReduceMotion ? undefined : { duration: 0.5 }}
           className="mx-auto max-w-2xl text-center mb-16"
         >
           <h2 className="text-base font-semibold text-cyan-400">Products</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            À La Carte <span className="text-gradient">Marketing Services</span>
+            A La Carte <span className="text-gradient">Marketing Services</span>
           </p>
           <p className="mt-4 text-lg text-muted-foreground">
             Choose individual services based on your specific needs. Mix and match to create your perfect marketing stack.
@@ -99,10 +101,10 @@ export function ProductsGrid() {
 
         {/* View all products link */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={shouldReduceMotion ? undefined : { once: true }}
+          transition={shouldReduceMotion ? undefined : { duration: 0.5, delay: 0.3 }}
           className="mt-12 text-center"
         >
           <Link
