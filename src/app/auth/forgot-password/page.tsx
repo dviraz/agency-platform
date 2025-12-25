@@ -2,7 +2,11 @@ import { ForgotPasswordForm } from '@/components/auth/forgot-password-form'
 
 export const metadata = {
   title: 'Forgot Password',
-  description: 'Request a password reset link.',
+  description: 'Request a password reset link for your Agency account.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default function ForgotPasswordPage() {

@@ -8,14 +8,15 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // Check authentication (optional for guest checkout)
+    const { data: { user } } = await supabase.auth.getUser()
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { productSlug, addonSlugs = [], guestEmail } = await request.json()
+
+    // For guest checkout, require email
+    if (!user && !guestEmail) {
+      return NextResponse.json({ error: 'Email required for guest checkout' }, { status: 400 })
     }
-
-    const { productSlug, addonSlugs = [] } = await request.json()
 
     if (!productSlug) {
       return NextResponse.json({ error: 'Product slug is required' }, { status: 400 })
@@ -64,17 +65,24 @@ export async function POST(request: NextRequest) {
     const combinedDescription = [mainProduct.name, ...selectedAddons.map(a => a.name)].join(' + ')
 
     // Create order in database first
+    const orderData: any = {
+      product_id: mainProduct.slug,
+      amount_usd: totalPrice,
+      status: 'pending',
+      metadata: {
+        addons: selectedAddons.map(a => ({ name: a.name, slug: a.slug, price: a.price })),
+        guestEmail: guestEmail || null
+      }
+    }
+
+    // Add user_id only if user is authenticated
+    if (user) {
+      orderData.user_id = user.id
+    }
+
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .insert({
-        user_id: user.id,
-        product_id: mainProduct.slug,
-        amount_usd: totalPrice,
-        status: 'pending',
-        metadata: {
-          addons: selectedAddons.map(a => ({ name: a.name, slug: a.slug, price: a.price }))
-        }
-      })
+      .insert(orderData)
       .select()
       .single()
 

@@ -4,7 +4,11 @@ import { BackgroundBeams } from '@/components/aceternity/background-beams'
 
 export const metadata = {
   title: 'Sign Up',
-  description: 'Create your account',
+  description: 'Create your Agency account to get started with premium digital marketing services.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default function SignupPage() {

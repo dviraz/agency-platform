@@ -90,6 +90,57 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Order not found' }, { status: 404 });
       }
 
+      // Handle guest checkout - create account if order has no user_id
+      let userId = order.user_id;
+      let userEmail = order.profiles?.email;
+
+      if (!userId && order.metadata?.guestEmail) {
+        const guestEmail = order.metadata.guestEmail;
+        console.log('Guest checkout detected, creating account for:', guestEmail);
+
+        // Check if user with this email already exists
+        const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers();
+        const userExists = existingUser?.users.find(u => u.email === guestEmail);
+
+        if (userExists) {
+          userId = userExists.id;
+          console.log('Found existing user:', userId);
+        } else {
+          // Create a new user account
+          const tempPassword = Math.random().toString(36).slice(-12) + 'Aa1!';
+          const { data: newUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
+            email: guestEmail,
+            password: tempPassword,
+            email_confirm: true, // Auto-confirm email
+          });
+
+          if (createUserError) {
+            console.error('Failed to create user:', createUserError);
+          } else if (newUser.user) {
+            userId = newUser.user.id;
+            userEmail = guestEmail;
+            console.log('Created new user:', userId);
+
+            // Create profile
+            await supabaseAdmin.from('profiles').insert({
+              id: userId,
+              email: guestEmail,
+              role: 'user',
+            });
+          }
+        }
+
+        // Link order to user
+        if (userId) {
+          await supabaseAdmin
+            .from('orders')
+            .update({ user_id: userId })
+            .eq('id', order.id);
+
+          order.user_id = userId;
+        }
+      }
+
       // Check if already processed (idempotency)
       if (order.status === 'payment_completed' || order.paypal_capture_id) {
         console.log('Order already processed, skipping');
@@ -120,15 +171,15 @@ export async function POST(request: NextRequest) {
         .eq('order_id', order.id)
         .single();
 
-      if (!existingIntake) {
+      if (!existingIntake && userId) {
         const { error: intakeError } = await supabaseAdmin
           .from('intake_forms')
           .insert({
             order_id: order.id,
-            user_id: order.user_id,
-            contact_email: order.profiles.email,
-            contact_person: order.profiles.full_name,
-            business_name: order.profiles.company_name,
+            user_id: userId,
+            contact_email: userEmail || order.profiles?.email,
+            contact_person: order.profiles?.full_name,
+            business_name: order.profiles?.company_name,
             current_step: 1,
             is_completed: false,
           });
@@ -142,20 +193,23 @@ export async function POST(request: NextRequest) {
 
       // Send payment confirmation email
       try {
-        const emailContent = getPaymentConfirmationEmail({
-          customerName: order.profiles.full_name || 'Customer',
-          productName: order.products.name,
-          amount: parseFloat(amount),
-          orderId: order.id,
-        });
+        const recipientEmail = userEmail || order.profiles?.email;
+        if (recipientEmail) {
+          const emailContent = getPaymentConfirmationEmail({
+            customerName: order.profiles?.full_name || 'Customer',
+            productName: order.products?.name || 'Your purchase',
+            amount: parseFloat(amount),
+            orderId: order.id,
+          });
 
-        await sendEmail({
-          to: order.profiles.email,
-          subject: emailContent.subject,
-          html: emailContent.html,
-        });
+          await sendEmail({
+            to: recipientEmail,
+            subject: emailContent.subject,
+            html: emailContent.html,
+          });
 
-        console.log('Payment confirmation email sent to:', order.profiles.email);
+          console.log('Payment confirmation email sent to:', recipientEmail);
+        }
       } catch (emailError) {
         console.error('Failed to send email:', emailError);
         // Don't fail the webhook if email fails

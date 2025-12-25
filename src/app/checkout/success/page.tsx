@@ -1,17 +1,28 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, useReducedMotion } from 'framer-motion'
 import { CheckCircle, ArrowRight, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { BackgroundBeams } from '@/components/aceternity/background-beams'
+import { sendGAEvent } from '@/components/analytics/google-analytics'
 
 function SuccessContent() {
   const searchParams = useSearchParams()
   const orderId = searchParams.get('orderId')
   const shouldReduceMotion = useReducedMotion()
+
+  // Track conversion in Google Analytics
+  useEffect(() => {
+    if (orderId) {
+      sendGAEvent('purchase', {
+        transaction_id: orderId,
+        currency: 'USD',
+      })
+    }
+  }, [orderId])
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">

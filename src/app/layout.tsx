@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Toaster } from '@/components/ui/sonner'
 import { ScrollProgress } from '@/components/effects/scroll-progress'
+import { OrganizationSchema } from '@/components/seo/json-ld'
+import { GoogleAnalytics } from '@/components/analytics/google-analytics'
 import './globals.css'
 
 const inter = Inter({
@@ -61,7 +63,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <OrganizationSchema />
+      </head>
       <body className={`${inter.variable} font-sans antialiased`}>
+        <GoogleAnalytics />
         <ScrollProgress />
         {children}
         <Toaster />

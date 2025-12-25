@@ -91,8 +91,8 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protected routes
-  const protectedPaths = ['/dashboard', '/checkout', '/intake', '/admin']
+  // Protected routes (checkout removed - now supports guest checkout)
+  const protectedPaths = ['/dashboard', '/intake', '/admin']
   const isProtectedPath = protectedPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)
   )

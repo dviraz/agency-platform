@@ -8,10 +8,11 @@ import { toast } from 'sonner'
 interface PayPalButtonProps {
   productSlug: string
   addonSlugs?: string[]
+  guestEmail?: string
   onSuccess?: (orderId: string) => void
 }
 
-export function PayPalButton({ productSlug, addonSlugs = [], onSuccess }: PayPalButtonProps) {
+export function PayPalButton({ productSlug, addonSlugs = [], guestEmail, onSuccess }: PayPalButtonProps) {
   const router = useRouter()
   const orderIdRef = useRef<string | null>(null)
 
@@ -22,9 +23,10 @@ export function PayPalButton({ productSlug, addonSlugs = [], onSuccess }: PayPal
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           productSlug,
-          addonSlugs 
+          addonSlugs,
+          guestEmail
         }),
       })
 

@@ -4,7 +4,11 @@ import { BackgroundBeams } from '@/components/aceternity/background-beams'
 
 export const metadata = {
   title: 'Sign In',
-  description: 'Sign in to your account',
+  description: 'Sign in to your Agency account to manage your projects and orders.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default async function LoginPage({

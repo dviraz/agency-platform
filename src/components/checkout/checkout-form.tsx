@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Check, Shield, Clock, Headphones, Plus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { PayPalButton } from '@/components/checkout/paypal-button'
 import { PRODUCTS, Product } from '@/lib/constants/products'
 import { cn } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
 
 interface CheckoutFormProps {
   initialProduct: {
@@ -26,10 +29,29 @@ const RECOMMENDED_ADDONS = [
 
 export function CheckoutForm({ initialProduct }: CheckoutFormProps) {
   const [selectedAddons, setSelectedAddons] = useState<Product[]>([])
+  const [guestEmail, setGuestEmail] = useState('')
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isEmailValid, setIsEmailValid] = useState(false)
 
-  const addons = PRODUCTS.filter(p => 
+  useEffect(() => {
+    async function checkAuth() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setIsAuthenticated(!!user)
+    }
+    checkAuth()
+  }, [])
+
+  useEffect(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    setIsEmailValid(emailRegex.test(guestEmail))
+  }, [guestEmail])
+
+  const addons = PRODUCTS.filter(p =>
     RECOMMENDED_ADDONS.includes(p.slug) && p.slug !== initialProduct.slug
   )
+
+  const canCheckout = isAuthenticated || isEmailValid
 
   const toggleAddon = (addon: Product) => {
     setSelectedAddons(prev => 
@@ -147,7 +169,7 @@ export function CheckoutForm({ initialProduct }: CheckoutFormProps) {
               <span className="text-muted-foreground">{initialProduct.name}</span>
               <span className="font-medium">${initialProduct.price.toLocaleString()}</span>
             </div>
-            
+
             {selectedAddons.map(addon => (
               <div key={addon.slug} className="flex justify-between text-sm animate-in fade-in slide-in-from-top-1">
                 <span className="text-muted-foreground">{addon.name}</span>
@@ -164,11 +186,37 @@ export function CheckoutForm({ initialProduct }: CheckoutFormProps) {
             </div>
           </div>
 
+          {!isAuthenticated && (
+            <div className="mb-6">
+              <Label htmlFor="guest-email" className="text-sm font-medium mb-2 block">
+                Email Address
+              </Label>
+              <Input
+                id="guest-email"
+                type="email"
+                placeholder="your@email.com"
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+                className="bg-background/50 border-white/10"
+              />
+              <p className="text-xs text-muted-foreground mt-2">
+                We'll create an account for you and send order details to this email.
+              </p>
+            </div>
+          )}
+
           <div className="space-y-4">
-            <PayPalButton 
-              productSlug={initialProduct.slug} 
-              addonSlugs={selectedAddons.map(a => a.slug)}
-            />
+            {canCheckout ? (
+              <PayPalButton
+                productSlug={initialProduct.slug}
+                addonSlugs={selectedAddons.map(a => a.slug)}
+                guestEmail={!isAuthenticated ? guestEmail : undefined}
+              />
+            ) : (
+              <Button disabled className="w-full">
+                Enter email to continue
+              </Button>
+            )}
             <p className="text-[10px] text-center text-muted-foreground">
               By completing your purchase, you agree to our Terms of Service and Privacy Policy.
               Payments are securely processed by PayPal.

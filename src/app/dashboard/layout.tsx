@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
@@ -18,6 +19,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Dashboard',
+    template: '%s | Dashboard | Agency',
+  },
+  description: 'Manage your projects, orders, and account settings.',
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
