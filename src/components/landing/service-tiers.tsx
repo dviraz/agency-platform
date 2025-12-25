@@ -85,10 +85,11 @@ export function ServiceTiers() {
             </button>
           </div>
 
-          {/* Savings Badge */}
+          {/* Savings/Benefit Badge */}
           <AnimatePresence mode="wait">
-            {billingCycle === 'onetime' && (
+            {billingCycle === 'onetime' ? (
               <motion.div
+                key="onetime-badge"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -97,6 +98,18 @@ export function ServiceTiers() {
               >
                 <Sparkles className="h-3 w-3" />
                 Save up to 62% with one-time payment
+              </motion.div>
+            ) : (
+              <motion.div
+                key="monthly-badge"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 border border-blue-500/20 px-3 py-1 text-xs font-medium text-blue-400"
+              >
+                <Sparkles className="h-3 w-3" />
+                Continuous Optimization & Priority Support Included
               </motion.div>
             )}
           </AnimatePresence>
@@ -159,6 +172,18 @@ export function ServiceTiers() {
                         <span className="text-sm text-muted-foreground">{feature}</span>
                       </li>
                     ))}
+                    {billingCycle === 'monthly' && (
+                      <>
+                        <li className="flex items-start gap-3">
+                          <Sparkles className="h-5 w-5 text-blue-400 shrink-0 mt-0.5" />
+                          <span className="text-sm text-blue-400 font-medium">Continuous SEO Updates</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <Sparkles className="h-5 w-5 text-blue-400 shrink-0 mt-0.5" />
+                          <span className="text-sm text-blue-400 font-medium">Monthly Performance Audit</span>
+                        </li>
+                      </>
+                    )}
                   </ul>
                 </div>
 
@@ -174,7 +199,9 @@ export function ServiceTiers() {
                     )}
                     size="lg"
                   >
-                    <Link href={`/checkout/${tier.slug}`}>Get Started</Link>
+                    <Link href={`/checkout/${tier.slug}${billingCycle === 'monthly' ? '?billing=monthly' : ''}`}>
+                      Get Started
+                    </Link>
                   </Button>
                 </div>
               </SpotlightCard>

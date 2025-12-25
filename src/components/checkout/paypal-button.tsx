@@ -7,10 +7,11 @@ import { toast } from 'sonner'
 
 interface PayPalButtonProps {
   productSlug: string
+  addonSlugs?: string[]
   onSuccess?: (orderId: string) => void
 }
 
-export function PayPalButton({ productSlug, onSuccess }: PayPalButtonProps) {
+export function PayPalButton({ productSlug, addonSlugs = [], onSuccess }: PayPalButtonProps) {
   const router = useRouter()
   const orderIdRef = useRef<string | null>(null)
 
@@ -21,7 +22,10 @@ export function PayPalButton({ productSlug, onSuccess }: PayPalButtonProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ productSlug }),
+        body: JSON.stringify({ 
+          productSlug,
+          addonSlugs 
+        }),
       })
 
       const data = await response.json()

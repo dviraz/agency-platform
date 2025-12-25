@@ -15,14 +15,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { productSlug } = await request.json()
+    const { productSlug, addonSlugs = [] } = await request.json()
 
     if (!productSlug) {
       return NextResponse.json({ error: 'Product slug is required' }, { status: 400 })
     }
 
-    // Find product (prefer database, fallback to local constants/service tiers)
-    let productData: { name: string; price: number; slug: string } | undefined
+    // Find main product
+    let mainProduct: { name: string; price: number; slug: string } | undefined
 
     const { data: productRecords } = await supabase
       .from('products')
@@ -34,38 +34,46 @@ export async function POST(request: NextRequest) {
     const productRecord = productRecords?.[0]
 
     if (productRecord) {
-      productData = {
+      mainProduct = {
         name: productRecord.name,
         price: productRecord.price_usd,
         slug: productRecord.slug,
       }
     }
 
-    if (!productData) {
+    if (!mainProduct) {
       const product = PRODUCTS.find((p) => p.slug === productSlug)
-
       if (product) {
-        productData = { name: product.name, price: product.price, slug: product.slug }
+        mainProduct = { name: product.name, price: product.price, slug: product.slug }
       } else {
         const tier = SERVICE_TIERS.find((t) => t.slug === productSlug)
         if (tier) {
-          productData = { name: tier.name, price: tier.price, slug: tier.slug }
+          mainProduct = { name: tier.name, price: tier.price, slug: tier.slug }
         }
       }
     }
 
-    if (!productData) {
+    if (!mainProduct) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
+
+    // Find add-ons
+    const selectedAddons = PRODUCTS.filter(p => addonSlugs.includes(p.slug))
+    
+    const totalPrice = mainProduct.price + selectedAddons.reduce((sum, a) => sum + a.price, 0)
+    const combinedDescription = [mainProduct.name, ...selectedAddons.map(a => a.name)].join(' + ')
 
     // Create order in database first
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
         user_id: user.id,
-        product_id: productData.slug, // Using slug as ID for now
-        amount_usd: productData.price,
+        product_id: mainProduct.slug,
+        amount_usd: totalPrice,
         status: 'pending',
+        metadata: {
+          addons: selectedAddons.map(a => ({ name: a.name, slug: a.slug, price: a.price }))
+        }
       })
       .select()
       .single()
@@ -77,8 +85,8 @@ export async function POST(request: NextRequest) {
 
     // Create PayPal order
     const paypalOrder = await createPayPalOrder(
-      productData.price,
-      productData.name,
+      totalPrice,
+      combinedDescription,
       order.id
     )
 
