@@ -73,7 +73,8 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
     handleSubmit,
     formState: { errors },
   } = useForm<SignupFormData>({
-    resolver: zodResolver(schema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(schema) as any,
   })
 
   const onSubmit = async (data: LoginFormData | SignupFormData) => {

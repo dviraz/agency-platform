@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FolderKanban, Receipt, TrendingUp } from 'lucide-react'
+import { Order, Project } from '@/types/database'
 
 export const metadata = {
   title: 'Admin Dashboard',
@@ -18,15 +19,15 @@ export default async function AdminPage() {
     .from('projects')
     .select('status')
 
-  const totalRevenue = (orders || [])
+  const totalRevenue = ((orders as unknown as Order[]) || [])
     .filter((order) => order.status === 'payment_completed')
     .reduce((sum: number, order) => sum + (order.amount_usd || 0), 0)
 
-  const activeProjects = (projects || []).filter((project) =>
+  const activeProjects = ((projects as unknown as Project[]) || []).filter((project) =>
     ['discovery', 'in_progress', 'review', 'revisions'].includes(project.status as string)
   )
 
-  const pendingOrders = (orders || []).filter((order) =>
+  const pendingOrders = ((orders as unknown as Order[]) || []).filter((order) =>
     ['pending', 'payment_processing'].includes(order.status as string)
   )
 
