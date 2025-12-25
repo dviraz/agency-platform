@@ -42,8 +42,10 @@ function getProductData(productSlug: string, billing?: string): CheckoutProductD
   return null
 }
 
-export function generateMetadata({ params, searchParams }: { params: { productId: string }, searchParams: { billing?: string } }): Metadata {
-  const productData = getProductData(params.productId, searchParams.billing)
+export async function generateMetadata({ params, searchParams }: { params: Promise<{ productId: string }>, searchParams: Promise<{ billing?: string }> }): Promise<Metadata> {
+  const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  const productData = getProductData(resolvedParams.productId, resolvedSearchParams.billing)
 
   if (!productData) {
     return {
@@ -58,17 +60,19 @@ export function generateMetadata({ params, searchParams }: { params: { productId
   }
 }
 
-export default function CheckoutPage({
+export default async function CheckoutPage({
   params,
   searchParams,
 }: {
-  params: { productId: string }
-  searchParams: { billing?: string }
+  params: Promise<{ productId: string }>
+  searchParams: Promise<{ billing?: string }>
 }) {
-  const productSlug = params.productId
+  const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+  const productSlug = resolvedParams.productId
 
   // Find product (check both products and service tiers)
-  const productData = getProductData(productSlug, searchParams.billing)
+  const productData = getProductData(productSlug, resolvedSearchParams.billing)
 
   if (!productData) {
     return (
