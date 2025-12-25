@@ -4,6 +4,8 @@ import { Footer } from '@/components/layout/footer'
 import { BackgroundBeams } from '@/components/aceternity/background-beams'
 import { ProcessSection } from '@/components/landing/process-section'
 import { CTASection } from '@/components/landing/cta-section'
+import { AnimatedStats } from '@/components/landing/animated-stats'
+import { FAQSection } from '@/components/landing/faq-section'
 import { CheckCircle, Rocket, Users, Award } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -105,35 +107,11 @@ export default function AboutPage() {
         {/* Process Section */}
         <ProcessSection />
 
-        {/* Stats Section */}
-        <section className="relative py-24 sm:py-32 bg-gradient-to-b from-background to-background/50">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl lg:text-center mb-16">
-              <h2 className="text-3xl font-bold sm:text-4xl">
-                Trusted by Businesses Worldwide
-              </h2>
-            </div>
+        {/* Stats Section with Animations */}
+        <AnimatedStats />
 
-            <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-gradient mb-2">500+</div>
-                <div className="text-sm text-muted-foreground">Projects Completed</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-gradient mb-2">200+</div>
-                <div className="text-sm text-muted-foreground">Happy Clients</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-gradient mb-2">50+</div>
-                <div className="text-sm text-muted-foreground">Team Members</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-gradient mb-2">99%</div>
-                <div className="text-sm text-muted-foreground">Client Satisfaction</div>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* FAQ Section */}
+        <FAQSection />
 
         {/* CTA Section */}
         <CTASection />

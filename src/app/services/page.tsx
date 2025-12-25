@@ -2,12 +2,16 @@ import { Metadata } from 'next'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { ServiceTiers } from '@/components/landing/service-tiers'
+import { ComparisonTable } from '@/components/landing/comparison-table'
+import { Testimonials } from '@/components/landing/testimonials'
+import { TrustBadges } from '@/components/landing/trust-badges'
 import { ProcessSection } from '@/components/landing/process-section'
+import { FAQSection } from '@/components/landing/faq-section'
 import { CTASection } from '@/components/landing/cta-section'
 import { BackgroundBeams } from '@/components/aceternity/background-beams'
 
 export const metadata: Metadata = {
-  title: 'Our Services | SynergyX Agency',
+  title: 'Our Services | Agency',
   description: 'Explore our comprehensive digital marketing and web development services. From starter packages to enterprise solutions.',
 }
 
@@ -37,8 +41,20 @@ export default function ServicesPage() {
         {/* Service Tiers */}
         <ServiceTiers />
 
+        {/* Comparison Table */}
+        <ComparisonTable />
+
+        {/* Testimonials */}
+        <Testimonials />
+
+        {/* Trust Badges */}
+        <TrustBadges />
+
         {/* Process Section */}
         <ProcessSection />
+
+        {/* FAQ Section */}
+        <FAQSection />
 
         {/* CTA Section */}
         <CTASection />

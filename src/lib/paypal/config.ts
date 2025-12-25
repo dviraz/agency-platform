@@ -87,3 +87,47 @@ export async function capturePayPalOrder(orderId: string) {
 
   return data
 }
+
+/**
+ * Verify PayPal webhook signature
+ * See: https://developer.paypal.com/api/rest/webhooks/
+ */
+export async function verifyWebhookSignature(
+  webhookId: string,
+  headers: {
+    transmissionId: string
+    transmissionTime: string
+    certUrl: string
+    authAlgo: string
+    transmissionSig: string
+  },
+  webhookEventBody: string
+): Promise<boolean> {
+  const accessToken = await getPayPalAccessToken()
+
+  const response = await fetch(`${PAYPAL_API_URL}/v1/notifications/verify-webhook-signature`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      auth_algo: headers.authAlgo,
+      cert_url: headers.certUrl,
+      transmission_id: headers.transmissionId,
+      transmission_sig: headers.transmissionSig,
+      transmission_time: headers.transmissionTime,
+      webhook_id: webhookId,
+      webhook_event: JSON.parse(webhookEventBody),
+    }),
+  })
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    console.error('Webhook verification failed:', data)
+    return false
+  }
+
+  return data.verification_status === 'SUCCESS'
+}

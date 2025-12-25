@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 
 // Use service role for server-side operations
 const supabaseAdmin = createClient(
@@ -13,13 +14,41 @@ const supabaseAdmin = createClient(
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { order_id, user_id } = body;
+    // Verify authenticated user
+    const supabase = await createServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!order_id || !user_id) {
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const { order_id } = body;
+
+    // Use authenticated user's ID, not from request body
+    const user_id = user.id;
+
+    if (!order_id) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
+      );
+    }
+
+    // Verify the order belongs to the authenticated user
+    const { data: order } = await supabaseAdmin
+      .from('orders')
+      .select('user_id')
+      .eq('id', order_id)
+      .single();
+
+    if (!order || order.user_id !== user_id) {
+      return NextResponse.json(
+        { error: 'Order not found or does not belong to user' },
+        { status: 403 }
       );
     }
 

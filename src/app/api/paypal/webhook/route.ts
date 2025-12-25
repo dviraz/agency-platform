@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendEmail, getPaymentConfirmationEmail } from '@/lib/email';
+import { verifyWebhookSignature } from '@/lib/paypal/config';
 
 // Use service role key for admin operations
 const supabaseAdmin = createClient(
@@ -8,21 +9,60 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+const PAYPAL_WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID;
+
 /**
  * PayPal Webhook Handler
- * 
+ *
  * This endpoint handles PayPal webhook events for payment reliability.
  * Critical event: PAYMENT.CAPTURE.COMPLETED
- * 
+ *
  * Even if the user closes their browser after payment, this webhook
  * ensures the order is marked as paid and the intake form is created.
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    // Get the raw body for signature verification
+    const rawBody = await request.text();
+    const body = JSON.parse(rawBody);
     const eventType = body.event_type;
 
     console.log('PayPal webhook received:', eventType);
+
+    // Verify webhook signature in production
+    if (PAYPAL_WEBHOOK_ID) {
+      const transmissionId = request.headers.get('paypal-transmission-id');
+      const transmissionTime = request.headers.get('paypal-transmission-time');
+      const certUrl = request.headers.get('paypal-cert-url');
+      const authAlgo = request.headers.get('paypal-auth-algo');
+      const transmissionSig = request.headers.get('paypal-transmission-sig');
+
+      if (!transmissionId || !transmissionTime || !certUrl || !authAlgo || !transmissionSig) {
+        console.error('Missing PayPal webhook headers');
+        return NextResponse.json({ error: 'Missing webhook headers' }, { status: 401 });
+      }
+
+      const isValid = await verifyWebhookSignature(
+        PAYPAL_WEBHOOK_ID,
+        {
+          transmissionId,
+          transmissionTime,
+          certUrl,
+          authAlgo,
+          transmissionSig,
+        },
+        rawBody
+      );
+
+      if (!isValid) {
+        console.error('Invalid PayPal webhook signature');
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      }
+
+      console.log('PayPal webhook signature verified');
+    } else {
+      console.warn('PAYPAL_WEBHOOK_ID not set - skipping signature verification (development only)');
+    }
 
     // Handle payment capture completed event
     if (eventType === 'PAYMENT.CAPTURE.COMPLETED') {
@@ -141,5 +181,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Verify webhook signature (optional but recommended for production)
-// See: https://developer.paypal.com/api/rest/webhooks/

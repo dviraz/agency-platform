@@ -3,11 +3,28 @@
 import Link from 'next/link'
 import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Mail, Phone, MapPin } from 'lucide-react'
+import { useState, MouseEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { MovingBorder } from '@/components/aceternity/moving-border'
 
 export function CTASection() {
   const shouldReduceMotion = useReducedMotion()
+  const [ripples, setRipples] = useState<Array<{ x: number; y: number; id: number }>>([])
+
+  const createRipple = (e: MouseEvent<HTMLButtonElement>) => {
+    const button = e.currentTarget
+    const rect = button.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
+    const newRipple = { x, y, id: Date.now() }
+    setRipples((prev) => [...prev, newRipple])
+
+    // Remove ripple after animation
+    setTimeout(() => {
+      setRipples((prev) => prev.filter((ripple) => ripple.id !== newRipple.id))
+    }, 600)
+  }
 
   return (
     <section id="contact" className="relative py-24 sm:py-32">
@@ -33,46 +50,75 @@ export function CTASection() {
                 </p>
 
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <Button
-                    size="lg"
-                    asChild
-                    className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 rounded-xl"
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={createRipple}
+                    className="relative overflow-hidden w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
                   >
-                    <Link href="#services">
+                    {ripples.map((ripple) => (
+                      <motion.span
+                        key={ripple.id}
+                        initial={{ scale: 0, opacity: 1 }}
+                        animate={{ scale: 4, opacity: 0 }}
+                        transition={{ duration: 0.6 }}
+                        style={{
+                          position: 'absolute',
+                          left: ripple.x,
+                          top: ripple.y,
+                          width: 20,
+                          height: 20,
+                          borderRadius: '50%',
+                          backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                          transform: 'translate(-50%, -50%)',
+                        }}
+                      />
+                    ))}
+                    <Link href="#services" className="relative z-10 flex items-center justify-center gap-2">
                       Get Started Now
-                      <ArrowRight className="ml-2 h-5 w-5" />
+                      <ArrowRight className="h-5 w-5" />
                     </Link>
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    asChild
-                    className="w-full sm:w-auto px-8 rounded-xl border-white/10 hover:bg-white/5"
+                  </motion.button>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    <Link href="mailto:hello@agency.com">Schedule a Call</Link>
-                  </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      asChild
+                      className="w-full sm:w-auto px-8 rounded-xl border-white/10 hover:bg-white/5"
+                    >
+                      <Link href="mailto:dvir@synergyx.pro">Schedule a Call</Link>
+                    </Button>
+                  </motion.div>
                 </div>
 
                 {/* Contact info */}
                 <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-muted-foreground">
-                  <a
-                    href="mailto:hello@agency.com"
+                  <motion.a
+                    href="mailto:dvir@synergyx.pro"
                     className="flex items-center gap-2 hover:text-foreground transition-colors"
+                    whileHover={{ scale: 1.1, color: 'rgb(var(--foreground))' }}
                   >
                     <Mail className="h-4 w-4" />
-                    hello@agency.com
-                  </a>
-                  <a
+                    dvir@synergyx.pro
+                  </motion.a>
+                  <motion.a
                     href="tel:+1234567890"
                     className="flex items-center gap-2 hover:text-foreground transition-colors"
+                    whileHover={{ scale: 1.1, color: 'rgb(var(--foreground))' }}
                   >
                     <Phone className="h-4 w-4" />
                     +1 (234) 567-890
-                  </a>
-                  <span className="flex items-center gap-2">
+                  </motion.a>
+                  <motion.span
+                    className="flex items-center gap-2"
+                    whileHover={{ scale: 1.1 }}
+                  >
                     <MapPin className="h-4 w-4" />
                     San Francisco, CA
-                  </span>
+                  </motion.span>
                 </div>
               </div>
             </MovingBorder>

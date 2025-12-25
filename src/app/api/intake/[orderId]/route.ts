@@ -1,11 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 
 // Use service role for server-side operations
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+/**
+ * Helper to verify user owns the order
+ */
+async function verifyOrderOwnership(orderId: string) {
+  const supabase = await createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: 'Unauthorized', status: 401 };
+  }
+
+  // Check if user is admin or owns the order
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  const isAdmin = profile?.role === 'admin';
+
+  const { data: order } = await supabaseAdmin
+    .from('orders')
+    .select('user_id')
+    .eq('id', orderId)
+    .single();
+
+  if (!order) {
+    return { error: 'Order not found', status: 404 };
+  }
+
+  if (!isAdmin && order.user_id !== user.id) {
+    return { error: 'Forbidden', status: 403 };
+  }
+
+  return { userId: user.id, isAdmin };
+}
 
 /**
  * GET /api/intake/[orderId]
@@ -17,6 +55,15 @@ export async function GET(
 ) {
   try {
     const { orderId } = await params;
+
+    // Verify ownership
+    const authResult = await verifyOrderOwnership(orderId);
+    if ('error' in authResult) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.status }
+      );
+    }
 
     const { data, error } = await supabaseAdmin
       .from('intake_forms')
@@ -51,6 +98,16 @@ export async function PATCH(
 ) {
   try {
     const { orderId } = await params;
+
+    // Verify ownership before allowing update
+    const authResult = await verifyOrderOwnership(orderId);
+    if ('error' in authResult) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.status }
+      );
+    }
+
     const body = await request.json();
 
     // Remove fields that shouldn't be updated directly

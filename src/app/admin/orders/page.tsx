@@ -1,5 +1,5 @@
 import { revalidatePath } from 'next/cache'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createAdminClient, verifyAdminRole } from '@/lib/supabase/admin'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -25,15 +25,20 @@ export const metadata = {
 async function updateOrderStatus(formData: FormData) {
   'use server'
 
+  // Verify admin role before proceeding
+  await verifyAdminRole()
+
   const orderId = formData.get('orderId')?.toString()
   const status = formData.get('status')?.toString()
 
   if (!orderId || !status) return
 
   const supabase = createAdminClient()
+
   await supabase
     .from('orders')
-    .update({ status: status as any, updated_at: new Date().toISOString() })
+    // @ts-ignore - Supabase generated types are overly restrictive for dynamic status updates
+    .update({ status, updated_at: new Date().toISOString() })
     .eq('id', orderId)
 
   revalidatePath('/admin/orders')
@@ -58,6 +63,7 @@ export default async function AdminOrdersPage({
 
   const { data: orders } = await ordersQuery
 
+  // @ts-ignore - Supabase type inference issue
   const userIds = Array.from(new Set((orders || []).map((order) => order.user_id)))
   const { data: profiles } = await supabase
     .from('profiles')
@@ -65,6 +71,7 @@ export default async function AdminOrdersPage({
     .in('id', userIds.length ? userIds : ['00000000-0000-0000-0000-000000000000'])
 
   const profileMap = new Map(
+    // @ts-ignore - Supabase type inference issue
     (profiles || []).map((profile) => [profile.id, profile])
   )
 
@@ -105,8 +112,8 @@ export default async function AdminOrdersPage({
       </Card>
 
       <div className="space-y-4">
-        {(orders || []).map((order) => {
-          const profile = profileMap.get(order.user_id)
+        {(orders || []).map((order: any) => {
+          const profile: any = profileMap.get(order.user_id)
           return (
             <Card key={order.id}>
               <CardContent className="p-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

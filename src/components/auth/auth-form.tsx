@@ -35,10 +35,35 @@ interface AuthFormProps {
   redirectTo?: string
 }
 
+/**
+ * Validate that a redirect URL is safe (internal only)
+ * Prevents open redirect vulnerabilities
+ */
+function getSafeRedirectUrl(url?: string): string {
+  const defaultUrl = '/dashboard'
+
+  if (!url) return defaultUrl
+
+  // Must start with single forward slash and not be protocol-relative
+  if (!url.startsWith('/') || url.startsWith('//')) {
+    return defaultUrl
+  }
+
+  // Additional check: ensure no protocol in the URL
+  if (url.includes('://')) {
+    return defaultUrl
+  }
+
+  return url
+}
+
 export function AuthForm({ mode, redirectTo }: AuthFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const supabase = createClient()
+
+  // Validate redirectTo to prevent open redirect attacks
+  const safeRedirectTo = getSafeRedirectUrl(redirectTo)
 
   const isLogin = mode === 'login'
   const schema = isLogin ? loginSchema : signupSchema
@@ -64,7 +89,7 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
         if (error) throw error
 
         toast.success('Welcome back!')
-        router.push(redirectTo || '/dashboard')
+        router.push(safeRedirectTo)
         router.refresh()
       } else {
         const signupData = data as SignupFormData

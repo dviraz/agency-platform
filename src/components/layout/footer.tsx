@@ -2,27 +2,26 @@ import Link from 'next/link'
 
 const footerNavigation = {
   services: [
-    { name: 'Web Development', href: '#' },
-    { name: 'Google Ads', href: '#' },
-    { name: 'Social Media', href: '#' },
-    { name: 'SEO', href: '#' },
-    { name: 'Branding', href: '#' },
+    { name: 'Web Development', href: '/products/web-development' },
+    { name: 'Advertising', href: '/products/advertising' },
+    { name: 'Social Media', href: '/products/social-media' },
+    { name: 'SEO', href: '/products/seo' },
+    { name: 'Branding', href: '/products/branding' },
   ],
   company: [
-    { name: 'About', href: '#' },
-    { name: 'Blog', href: '#' },
-    { name: 'Careers', href: '#' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'About', href: '/about' },
+    { name: 'Services', href: '/services' },
+    { name: 'Products', href: '/products' },
+    { name: 'Contact', href: '/contact' },
   ],
   legal: [
     { name: 'Privacy Policy', href: '/legal/privacy' },
     { name: 'Terms of Service', href: '/legal/terms' },
-    { name: 'Refund Policy', href: '#' },
   ],
   social: [
-    { name: 'Twitter', href: '#' },
-    { name: 'LinkedIn', href: '#' },
-    { name: 'Instagram', href: '#' },
+    { name: 'Twitter', href: 'https://twitter.com', external: true },
+    { name: 'LinkedIn', href: 'https://linkedin.com', external: true },
+    { name: 'Instagram', href: 'https://instagram.com', external: true },
   ],
 }
 
@@ -101,6 +100,8 @@ export function Footer() {
                     <li key={item.name}>
                       <a
                         href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                       >
                         {item.name}

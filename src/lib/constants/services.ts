@@ -4,6 +4,7 @@ export const SERVICE_TIERS = [
     name: 'Starter',
     slug: 'starter',
     price: 2500,
+    monthlyPrice: 499,
     description: 'Perfect for small businesses getting started',
     features: [
       'Custom website design',
@@ -21,6 +22,7 @@ export const SERVICE_TIERS = [
     name: 'Growth',
     slug: 'growth',
     price: 7500,
+    monthlyPrice: 1299,
     description: 'Ideal for growing businesses ready to scale',
     features: [
       'Everything in Starter',
@@ -40,6 +42,7 @@ export const SERVICE_TIERS = [
     name: 'Enterprise',
     slug: 'enterprise',
     price: 15000,
+    monthlyPrice: 2999,
     description: 'Complete solution for established businesses',
     features: [
       'Everything in Growth',

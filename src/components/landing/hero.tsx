@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Spotlight } from '@/components/aceternity/spotlight'
 import { BackgroundBeams } from '@/components/aceternity/background-beams'
 import { TextGenerateEffect } from '@/components/aceternity/text-generate-effect'
+import { GradientMesh } from '@/components/effects/gradient-mesh'
 
 export function Hero() {
   const shouldReduceMotion = useReducedMotion()
@@ -24,10 +25,7 @@ export function Hero() {
     <Spotlight className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Background effects */}
       <BackgroundBeams className="opacity-40" />
-
-      {/* Gradient orbs */}
-      <div className="absolute top-1/4 -left-20 w-72 h-72 bg-blue-500/30 rounded-full blur-[120px]" />
-      <div className="absolute bottom-1/4 -right-20 w-72 h-72 bg-purple-500/30 rounded-full blur-[120px]" />
+      <GradientMesh />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 py-24 sm:py-32">
         <div className="mx-auto max-w-3xl text-center">

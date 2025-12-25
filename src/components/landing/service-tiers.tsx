@@ -1,15 +1,19 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
 import { Check, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { SERVICE_TIERS } from '@/lib/constants/services'
 import { SpotlightCard } from '@/components/aceternity/spotlight'
 
+type BillingCycle = 'onetime' | 'monthly'
+
 export function ServiceTiers() {
   const shouldReduceMotion = useReducedMotion()
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>('onetime')
 
   return (
     <section id="services" className="relative py-24 sm:py-32">
@@ -32,6 +36,70 @@ export function ServiceTiers() {
           <p className="mt-4 text-lg text-muted-foreground">
             Select the package that best fits your business needs. All plans include our premium support.
           </p>
+        </motion.div>
+
+        {/* Pricing Toggle */}
+        <motion.div
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={shouldReduceMotion ? undefined : { once: true }}
+          transition={shouldReduceMotion ? undefined : { duration: 0.5, delay: 0.1 }}
+          className="mt-12 flex flex-col items-center gap-4"
+        >
+          <div className="relative inline-flex items-center rounded-full bg-card/50 backdrop-blur-xl border border-white/10 p-1">
+            <button
+              onClick={() => setBillingCycle('onetime')}
+              className={cn(
+                'relative px-6 py-2 rounded-full text-sm font-medium transition-all duration-300',
+                billingCycle === 'onetime'
+                  ? 'text-white'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {billingCycle === 'onetime' && (
+                <motion.div
+                  layoutId="pricing-toggle"
+                  className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"
+                  transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              <span className="relative z-10">One-Time</span>
+            </button>
+            <button
+              onClick={() => setBillingCycle('monthly')}
+              className={cn(
+                'relative px-6 py-2 rounded-full text-sm font-medium transition-all duration-300',
+                billingCycle === 'monthly'
+                  ? 'text-white'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {billingCycle === 'monthly' && (
+                <motion.div
+                  layoutId="pricing-toggle"
+                  className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"
+                  transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              <span className="relative z-10">Monthly</span>
+            </button>
+          </div>
+
+          {/* Savings Badge */}
+          <AnimatePresence mode="wait">
+            {billingCycle === 'onetime' && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="inline-flex items-center gap-1 rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-xs font-medium text-green-400"
+              >
+                <Sparkles className="h-3 w-3" />
+                Save up to 62% with one-time payment
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Pricing cards */}
@@ -66,10 +134,21 @@ export function ServiceTiers() {
 
                   {/* Price */}
                   <div className="mt-6 flex items-baseline gap-1">
-                    <span className="text-4xl font-bold tracking-tight text-foreground">
-                      ${tier.price.toLocaleString()}
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={billingCycle}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-4xl font-bold tracking-tight text-foreground"
+                      >
+                        ${billingCycle === 'onetime' ? tier.price.toLocaleString() : tier.monthlyPrice.toLocaleString()}
+                      </motion.span>
+                    </AnimatePresence>
+                    <span className="text-sm text-muted-foreground">
+                      {billingCycle === 'onetime' ? 'USD' : '/mo'}
                     </span>
-                    <span className="text-sm text-muted-foreground">USD</span>
                   </div>
 
                   {/* Features */}
