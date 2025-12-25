@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
@@ -85,18 +85,7 @@ export function IntakeForm({ orderId, initialData, initialStep = 1 }: IntakeForm
 
   const formData = watch()
 
-  // Auto-save on data change (debounced)
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (currentStep < 5) {
-        saveProgress()
-      }
-    }, 2000)
-
-    return () => clearTimeout(timeout)
-  }, [formData])
-
-  const saveProgress = async () => {
+  const saveProgress = useCallback(async () => {
     setIsSaving(true)
     try {
       const { error } = await supabase
@@ -114,7 +103,18 @@ export function IntakeForm({ orderId, initialData, initialStep = 1 }: IntakeForm
     } finally {
       setIsSaving(false)
     }
-  }
+  }, [formData, currentStep, orderId, supabase])
+
+  // Auto-save on data change (debounced)
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (currentStep < 5) {
+        saveProgress()
+      }
+    }, 2000)
+
+    return () => clearTimeout(timeout)
+  }, [formData, currentStep, saveProgress])
 
   const validateStep = async (step: number): Promise<boolean> => {
     const stepFields: Record<number, (keyof IntakeFormData)[]> = {
@@ -170,8 +170,9 @@ export function IntakeForm({ orderId, initialData, initialStep = 1 }: IntakeForm
 
       toast.success('Intake form submitted successfully!')
       router.push('/dashboard')
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to submit form')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to submit form'
+      toast.error(message)
     } finally {
       setIsSubmitting(false)
     }

@@ -33,13 +33,14 @@ export function PayPalButton({ productSlug, onSuccess }: PayPalButtonProps) {
       orderIdRef.current = data.orderId
 
       return data.paypalOrderId
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to create order')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to create order'
+      toast.error(message)
       throw error
     }
   }
 
-  const onApprove = async (data: any) => {
+  const onApprove = async (data: { orderID: string }) => {
     try {
       if (!orderIdRef.current) {
         throw new Error('Order ID missing. Please try again.')
@@ -69,8 +70,9 @@ export function PayPalButton({ productSlug, onSuccess }: PayPalButtonProps) {
       } else {
         router.push(`/checkout/success?orderId=${captureData.orderId}`)
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to process payment')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to process payment'
+      toast.error(message)
     }
   }
 

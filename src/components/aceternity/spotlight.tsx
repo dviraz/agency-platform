@@ -7,10 +7,9 @@ import { cn } from '@/lib/utils'
 interface SpotlightProps {
   children: React.ReactNode
   className?: string
-  fill?: string
 }
 
-export function Spotlight({ children, className, fill = 'white' }: SpotlightProps) {
+export function Spotlight({ children, className }: SpotlightProps) {
   const shouldReduceMotion = useReducedMotion()
   const containerRef = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState({ x: 0, y: 0 })

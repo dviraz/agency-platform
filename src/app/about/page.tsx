@@ -31,7 +31,7 @@ export default function AboutPage() {
               <span className="text-gradient">About SynergyX</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              We're a team of digital experts passionate about transforming businesses through innovative marketing strategies and cutting-edge technology.
+              We&apos;re a team of digital experts passionate about transforming businesses through innovative marketing strategies and cutting-edge technology.
             </p>
           </div>
         </section>

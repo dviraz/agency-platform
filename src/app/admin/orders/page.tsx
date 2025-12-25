@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
+import { Profile, Order } from '@/types/database'
 
 const orderStatuses = [
   'pending',
@@ -37,7 +38,7 @@ async function updateOrderStatus(formData: FormData) {
 
   await supabase
     .from('orders')
-    // @ts-ignore - Supabase generated types are overly restrictive for dynamic status updates
+    // @ts-expect-error - Supabase generated types are overly restrictive for dynamic status updates
     .update({ status, updated_at: new Date().toISOString() })
     .eq('id', orderId)
 
@@ -63,15 +64,15 @@ export default async function AdminOrdersPage({
 
   const { data: orders } = await ordersQuery
 
-  // @ts-ignore - Supabase type inference issue
+  // @ts-expect-error - Supabase type inference issue
   const userIds = Array.from(new Set((orders || []).map((order) => order.user_id)))
   const { data: profiles } = await supabase
     .from('profiles')
     .select('id, full_name, email')
     .in('id', userIds.length ? userIds : ['00000000-0000-0000-0000-000000000000'])
 
-  const profileMap = new Map(
-    // @ts-ignore - Supabase type inference issue
+  const profileMap = new Map<string, Partial<Profile>>(
+    // @ts-expect-error - Supabase type inference issue
     (profiles || []).map((profile) => [profile.id, profile])
   )
 
@@ -112,8 +113,8 @@ export default async function AdminOrdersPage({
       </Card>
 
       <div className="space-y-4">
-        {(orders || []).map((order: any) => {
-          const profile: any = profileMap.get(order.user_id)
+        {(orders || []).map((order: Order) => {
+          const profile = profileMap.get(order.user_id as string)
           return (
             <Card key={order.id}>
               <CardContent className="p-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

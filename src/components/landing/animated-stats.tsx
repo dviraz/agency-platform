@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import { motion, useReducedMotion, useInView } from 'framer-motion'
 import CountUp from 'react-countup'
 
@@ -38,13 +38,6 @@ export function AnimatedStats() {
   const shouldReduceMotion = useReducedMotion()
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
-  const [hasAnimated, setHasAnimated] = useState(false)
-
-  useEffect(() => {
-    if (isInView && !hasAnimated) {
-      setHasAnimated(true)
-    }
-  }, [isInView, hasAnimated])
 
   return (
     <section ref={ref} className="relative py-24 sm:py-32 bg-gradient-to-b from-background to-background/50">
@@ -81,7 +74,7 @@ export function AnimatedStats() {
 
               <div className="relative">
                 <div className="text-4xl font-bold text-gradient mb-2">
-                  {hasAnimated || shouldReduceMotion ? (
+                  {isInView || shouldReduceMotion ? (
                     <CountUp
                       end={stat.value}
                       duration={2.5}

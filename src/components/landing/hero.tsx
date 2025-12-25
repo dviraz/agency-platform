@@ -92,7 +92,7 @@ export function Hero() {
               { label: 'Projects Delivered', value: '200+' },
               { label: 'Happy Clients', value: '150+' },
               { label: 'Years Experience', value: '8+' },
-            ].map((stat, index) => (
+            ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-gradient">{stat.value}</div>
                 <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>

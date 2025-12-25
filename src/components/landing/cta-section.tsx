@@ -46,7 +46,7 @@ export function CTASection() {
                   Ready to <span className="text-gradient">Transform</span> Your Business?
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Let's discuss how we can help you achieve your marketing goals. Get in touch with our team today.
+                  Let&apos;s discuss how we can help you achieve your marketing goals. Get in touch with our team today.
                 </p>
 
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">

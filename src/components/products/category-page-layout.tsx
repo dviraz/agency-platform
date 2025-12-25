@@ -209,7 +209,7 @@ export function CategoryPageLayout({
           >
             <h3 className="text-2xl font-bold mb-3">Need a Custom Solution?</h3>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Our packages don't quite fit? We'll create a custom solution tailored to your specific needs and budget.
+              Our packages don&apos;t quite fit? We&apos;ll create a custom solution tailored to your specific needs and budget.
             </p>
             <Link
               href="/contact"
@@ -250,7 +250,7 @@ export function CategoryPageLayout({
                       <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                  <p className="text-muted-foreground mb-4 italic">"{testimonial.quote}"</p>
+                  <p className="text-muted-foreground mb-4 italic">&quot;{testimonial.quote}&quot;</p>
                   <div>
                     <p className="font-semibold">{testimonial.name}</p>
                     <p className="text-sm text-muted-foreground">

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // Quick Supabase connection test
 const { createClient } = require('@supabase/supabase-js')
 

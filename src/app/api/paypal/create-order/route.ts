@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!productData) {
-      let product = PRODUCTS.find((p) => p.slug === productSlug)
+      const product = PRODUCTS.find((p) => p.slug === productSlug)
 
       if (product) {
         productData = { name: product.name, price: product.price, slug: product.slug }
@@ -95,10 +95,11 @@ export async function POST(request: NextRequest) {
       orderId: order.id,
       paypalOrderId: paypalOrder.id,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Create order error:', error)
+    const message = error instanceof Error ? error.message : 'Internal server error'
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: message },
       { status: 500 }
     )
   }

@@ -15,7 +15,7 @@ type CheckoutProductData = {
 }
 
 function getProductData(productSlug: string): CheckoutProductData | null {
-  let product = PRODUCTS.find((p) => p.slug === productSlug)
+  const product = PRODUCTS.find((p) => p.slug === productSlug)
 
   if (product) {
     return {
@@ -107,7 +107,7 @@ export default function CheckoutPage({ params }: { params: { productId: string }
 
             {/* Features */}
             <div className="space-y-3 mb-8">
-              <h3 className="font-semibold mb-4">What's included:</h3>
+              <h3 className="font-semibold mb-4">What&apos;s included:</h3>
               {productData.features.map((feature, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <Check className="h-5 w-5 text-cyan-400 shrink-0 mt-0.5" />

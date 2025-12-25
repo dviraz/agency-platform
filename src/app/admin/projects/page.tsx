@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Profile, Project } from '@/types/database'
 
 const projectStatuses = [
   'not_started',
@@ -42,7 +43,7 @@ async function updateProject(formData: FormData) {
 
   await supabase
     .from('projects')
-    // @ts-ignore - Supabase type inference issue
+    // @ts-expect-error - Supabase type inference issue
     .update({
       status,
       progress_percentage: progress,
@@ -53,7 +54,7 @@ async function updateProject(formData: FormData) {
   if (updateTitle) {
     await supabase
       .from('project_updates')
-      // @ts-ignore - Supabase type inference issue
+      // @ts-expect-error - Supabase type inference issue
       .insert({
         project_id: projectId,
         title: updateTitle,
@@ -74,15 +75,15 @@ export default async function AdminProjectsPage() {
     .select('id, project_name, status, progress_percentage, user_id, created_at')
     .order('created_at', { ascending: false })
 
-  // @ts-ignore - Supabase type inference issue
+  // @ts-expect-error - Supabase type inference issue
   const userIds = Array.from(new Set((projects || []).map((project) => project.user_id)))
   const { data: profiles } = await supabase
     .from('profiles')
     .select('id, full_name, email')
     .in('id', userIds.length ? userIds : ['00000000-0000-0000-0000-000000000000'])
 
-  const profileMap = new Map(
-    // @ts-ignore - Supabase type inference issue
+  const profileMap = new Map<string, Partial<Profile>>(
+    // @ts-expect-error - Supabase type inference issue
     (profiles || []).map((profile) => [profile.id, profile])
   )
 
@@ -96,8 +97,8 @@ export default async function AdminProjectsPage() {
       </div>
 
       <div className="space-y-4">
-        {(projects || []).map((project: any) => {
-          const profile: any = profileMap.get(project.user_id)
+        {(projects || []).map((project: Project) => {
+          const profile = profileMap.get(project.user_id as string)
           return (
             <Card key={project.id}>
               <CardContent className="p-6 space-y-6">

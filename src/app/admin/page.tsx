@@ -19,15 +19,15 @@ export default async function AdminPage() {
     .select('status')
 
   const totalRevenue = (orders || [])
-    .filter((order: any) => order.status === 'payment_completed')
-    .reduce((sum: number, order: any) => sum + (order.amount_usd || 0), 0)
+    .filter((order) => order.status === 'payment_completed')
+    .reduce((sum: number, order) => sum + (order.amount_usd || 0), 0)
 
-  const activeProjects = (projects || []).filter((project: any) =>
-    ['discovery', 'in_progress', 'review', 'revisions'].includes(project.status)
+  const activeProjects = (projects || []).filter((project) =>
+    ['discovery', 'in_progress', 'review', 'revisions'].includes(project.status as string)
   )
 
-  const pendingOrders = (orders || []).filter((order: any) =>
-    ['pending', 'payment_processing'].includes(order.status)
+  const pendingOrders = (orders || []).filter((order) =>
+    ['pending', 'payment_processing'].includes(order.status as string)
   )
 
   return (

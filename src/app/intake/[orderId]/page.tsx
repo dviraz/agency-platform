@@ -40,7 +40,7 @@ export default async function IntakePage({
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Intake form not found</h1>
           <p className="text-muted-foreground mb-4">
-            This order may not exist or you don't have access to it.
+            This order may not exist or you don&apos;t have access to it.
           </p>
           <Link
             href="/dashboard"

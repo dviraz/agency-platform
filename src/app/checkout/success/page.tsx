@@ -40,7 +40,7 @@ function SuccessContent() {
         >
           <h1 className="text-3xl font-bold mb-4">Payment Successful!</h1>
           <p className="text-muted-foreground mb-8">
-            Thank you for your purchase. We've sent a confirmation email with your order details.
+            Thank you for your purchase. We&apos;ve sent a confirmation email with your order details.
           </p>
 
           {orderId && (

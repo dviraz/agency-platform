@@ -56,7 +56,7 @@ export function ProcessSection() {
             Simple <span className="text-gradient">4-Step Process</span>
           </p>
           <p className="mt-4 text-lg text-muted-foreground">
-            From selection to delivery, we've streamlined every step to make your experience seamless.
+            From selection to delivery, we&apos;ve streamlined every step to make your experience seamless.
           </p>
         </motion.div>
 

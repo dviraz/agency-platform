@@ -111,7 +111,11 @@ export async function PATCH(
     const body = await request.json();
 
     // Remove fields that shouldn't be updated directly
-    const { id, order_id, user_id, created_at, ...updateData } = body;
+    const updateData = { ...body };
+    delete updateData.id;
+    delete updateData.order_id;
+    delete updateData.user_id;
+    delete updateData.created_at;
 
     // Always update the timestamp
     updateData.updated_at = new Date().toISOString();

@@ -70,7 +70,6 @@ export async function POST(request: NextRequest) {
       const orderId = body.resource.supplementary_data?.related_ids?.order_id;
       const amount = body.resource.amount.value;
       const currency = body.resource.amount.currency_code;
-      const payerEmail = body.resource.payer?.email_address;
 
       console.log('Payment captured:', { captureId, orderId, amount, currency });
 

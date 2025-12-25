@@ -72,7 +72,7 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData | SignupFormData>({
+  } = useForm<SignupFormData>({
     resolver: zodResolver(schema),
   })
 
@@ -108,8 +108,9 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
 
         toast.success('Check your email to confirm your account!')
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Something went wrong')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Something went wrong'
+      toast.error(message)
     } finally {
       setIsLoading(false)
     }
@@ -138,14 +139,14 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
                 id="fullName"
                 placeholder="John Doe"
                 className="pl-10"
-                aria-describedby={(errors as any).fullName ? 'fullName-error' : undefined}
-                aria-invalid={!!(errors as any).fullName}
-                {...register('fullName' as keyof (LoginFormData | SignupFormData))}
+                aria-describedby={errors.fullName ? 'fullName-error' : undefined}
+                aria-invalid={!!errors.fullName}
+                {...register('fullName')}
               />
             </div>
-            {(errors as any).fullName && (
+            {errors.fullName && (
               <p id="fullName-error" className="text-sm text-destructive">
-                {(errors as any).fullName.message}
+                {errors.fullName.message}
               </p>
             )}
           </div>
@@ -210,14 +211,14 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
                 type="password"
                 placeholder="Confirm your password"
                 className="pl-10"
-                aria-describedby={(errors as any).confirmPassword ? 'confirmPassword-error' : undefined}
-                aria-invalid={!!(errors as any).confirmPassword}
-                {...register('confirmPassword' as keyof (LoginFormData | SignupFormData))}
+                aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
+                aria-invalid={!!errors.confirmPassword}
+                {...register('confirmPassword')}
               />
             </div>
-            {(errors as any).confirmPassword && (
+            {errors.confirmPassword && (
               <p id="confirmPassword-error" className="text-sm text-destructive">
-                {(errors as any).confirmPassword.message}
+                {errors.confirmPassword.message}
               </p>
             )}
           </div>
@@ -236,7 +237,7 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
       <div className="mt-6 text-center text-sm text-muted-foreground">
         {isLogin ? (
           <>
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/auth/signup" className="text-primary hover:underline">
               Sign up
             </Link>

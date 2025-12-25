@@ -99,7 +99,7 @@ test.describe('Integration Tests - PayPal & Email', () => {
     // Check for PayPal SDK script
     console.log('3️⃣ Checking PayPal SDK loaded...');
     const hasPayPalSDK = await page.evaluate(() => {
-      return typeof (window as any).paypal !== 'undefined';
+      return 'paypal' in window;
     });
 
     if (hasPayPalSDK) {
@@ -153,7 +153,7 @@ test.describe('Integration Tests - PayPal & Email', () => {
     console.log('✅ API routes test completed\n');
   });
 
-  test('Email Configuration Check', async ({ page }) => {
+  test('Email Configuration Check', async () => {
     console.log('🧪 Checking email configuration...\n');
 
     // We can't send actual emails in tests, but we can verify the config

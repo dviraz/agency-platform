@@ -33,8 +33,9 @@ export function ForgotPasswordForm() {
       if (error) throw error
 
       toast.success('Password reset link sent. Please check your email.')
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to send reset email.')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to send reset email.'
+      toast.error(message)
     } finally {
       setIsLoading(false)
     }

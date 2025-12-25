@@ -13,6 +13,7 @@ import {
   Circle,
   MessageSquare,
 } from 'lucide-react'
+import { ProjectUpdate } from '@/types/database'
 
 const statusColors: Record<string, string> = {
   not_started: 'bg-gray-500',
@@ -60,8 +61,8 @@ export default async function ProjectDetailPage({
     notFound()
   }
 
-  const updates = project.project_updates?.sort(
-    (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  const updates = (project.project_updates as unknown as ProjectUpdate[])?.sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   ) || []
 
   return (
@@ -170,15 +171,15 @@ export default async function ProjectDetailPage({
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
-              {project.deliverables.map((item: any, index: number) => (
+              {(project.deliverables as Array<{ name?: string; completed?: boolean } | string>).map((item, index: number) => (
                 <li key={index} className="flex items-start gap-3">
-                  {item.completed ? (
+                  {typeof item === 'object' && item.completed ? (
                     <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
                   ) : (
                     <Circle className="h-5 w-5 text-muted-foreground mt-0.5" />
                   )}
-                  <span className={item.completed ? 'line-through text-muted-foreground' : ''}>
-                    {item.name || item}
+                  <span className={typeof item === 'object' && item.completed ? 'line-through text-muted-foreground' : ''}>
+                    {typeof item === 'object' ? item.name : item}
                   </span>
                 </li>
               ))}
@@ -198,11 +199,11 @@ export default async function ProjectDetailPage({
         <CardContent>
           {updates.length === 0 ? (
             <p className="text-muted-foreground text-center py-8">
-              No updates yet. We'll post updates here as your project progresses.
+              No updates yet. We&apos;ll post updates here as your project progresses.
             </p>
           ) : (
             <div className="space-y-6">
-              {updates.map((update: any, index: number) => (
+              {updates.map((update, index) => (
                 <div key={update.id}>
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-2" />

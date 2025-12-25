@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Home, ArrowLeft, Search } from 'lucide-react'
+import { Home, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default function NotFound() {
@@ -14,8 +14,8 @@ export default function NotFound() {
         {/* Error message */}
         <h2 className="text-2xl font-bold mb-4">Page not found</h2>
         <p className="text-muted-foreground mb-8">
-          Oops! The page you're looking for doesn't exist or has been moved.
-          Let's get you back on track.
+          Oops! The page you&apos;re looking for doesn&apos;t exist or has been moved.
+          Let&apos;s get you back on track.
         </p>
 
         {/* Action buttons */}

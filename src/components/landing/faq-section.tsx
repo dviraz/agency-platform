@@ -208,7 +208,7 @@ export function FAQSection() {
             >
               Contact our team
             </a>
-            {' '}and we'll be happy to help.
+            {' '}and we&apos;ll be happy to help.
           </p>
         </motion.div>
       </div>

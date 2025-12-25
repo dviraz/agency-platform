@@ -78,7 +78,6 @@ export async function PATCH(
 ) {
   try {
     const { id: projectId } = await params;
-    const cookieStore = await cookies();
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
@@ -87,7 +86,11 @@ export async function PATCH(
     const body = await request.json();
 
     // Remove fields that shouldn't be updated directly
-    const { id, order_id, user_id, created_at, ...updateData } = body;
+    const updateData = { ...body };
+    delete updateData.id;
+    delete updateData.order_id;
+    delete updateData.user_id;
+    delete updateData.created_at;
 
     // Always update the timestamp
     updateData.updated_at = new Date().toISOString();

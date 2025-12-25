@@ -69,7 +69,7 @@ export function TrustBadges() {
             Why Choose <span className="text-gradient">Agency</span>
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Your success is our commitment. Here's what sets us apart.
+            Your success is our commitment. Here&apos;s what sets us apart.
           </p>
         </motion.div>
 

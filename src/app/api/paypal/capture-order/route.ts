@@ -172,10 +172,11 @@ export async function POST(request: NextRequest) {
       orderId,
       captureId: captureData.purchase_units?.[0]?.payments?.captures?.[0]?.id,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Capture order error:', error)
+    const message = error instanceof Error ? error.message : 'Internal server error'
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: message },
       { status: 500 }
     )
   }

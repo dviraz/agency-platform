@@ -45,7 +45,7 @@ export default function ContactPage() {
               <span className="text-gradient">Get in Touch</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Ready to transform your business? Let's talk about your next project.
+              Ready to transform your business? Let&apos;s talk about your next project.
             </p>
           </div>
         </section>
@@ -58,7 +58,7 @@ export default function ContactPage() {
               <div>
                 <h2 className="text-3xl font-bold mb-8">Contact Information</h2>
                 <p className="text-muted-foreground mb-8">
-                  Have a question or want to discuss a project? We're here to help. Reach out to us using any of the methods below.
+                  Have a question or want to discuss a project? We&apos;re here to help. Reach out to us using any of the methods below.
                 </p>
 
                 <div className="space-y-6">
