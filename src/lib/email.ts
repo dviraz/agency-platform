@@ -18,6 +18,11 @@ interface EmailOptions {
   text?: string
 }
 
+/**
+ * Send an email using the configured SMTP transporter
+ * @param options - Email configuration including recipient, subject, and content
+ * @returns Object with success status and messageId or error
+ */
 export async function sendEmail({ to, subject, html, text }: EmailOptions) {
   try {
     const info = await transporter.sendMail({
@@ -28,15 +33,19 @@ export async function sendEmail({ to, subject, html, text }: EmailOptions) {
       html,
     })
 
-    console.log('Email sent:', info.messageId)
     return { success: true, messageId: info.messageId }
   } catch (error) {
-    console.error('Email error:', error)
     return { success: false, error }
   }
 }
 
 // Email templates
+
+/**
+ * Generate payment confirmation email content
+ * @param data - Customer and order information
+ * @returns Email subject and HTML content
+ */
 export function getPaymentConfirmationEmail(data: {
   customerName: string
   productName: string
@@ -93,6 +102,11 @@ export function getPaymentConfirmationEmail(data: {
   }
 }
 
+/**
+ * Generate project update email content
+ * @param data - Customer and project update information
+ * @returns Email subject and HTML content
+ */
 export function getProjectUpdateEmail(data: {
   customerName: string
   projectName: string
@@ -131,6 +145,57 @@ export function getProjectUpdateEmail(data: {
                style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 20px;">
               View in Dashboard
             </a>
+          </div>
+        </body>
+      </html>
+    `,
+  }
+}
+
+/**
+ * Generate contact form submission email content
+ * @param data - Contact form submission data
+ * @returns Email subject and HTML content
+ */
+export function getContactFormEmail(data: {
+  firstName: string
+  lastName: string
+  email: string
+  company?: string
+  subject: string
+  message: string
+}) {
+  const { firstName, lastName, email, company, subject, message } = data
+
+  return {
+    subject: `Contact Form: ${subject}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0a0a0a; color: #fafafa; padding: 40px 20px;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #171717; border-radius: 12px; padding: 40px; border: 1px solid rgba(255,255,255,0.1);">
+            <h1 style="color: #fafafa; font-size: 24px; margin-bottom: 20px;">New Contact Form Submission</h1>
+
+            <div style="background-color: #262626; border-radius: 8px; padding: 20px; margin: 20px 0;">
+              <h2 style="color: #fafafa; font-size: 18px; margin-bottom: 15px;">Contact Information</h2>
+              <p style="color: #a1a1aa; margin: 8px 0;"><strong>Name:</strong> ${firstName} ${lastName}</p>
+              <p style="color: #a1a1aa; margin: 8px 0;"><strong>Email:</strong> ${email}</p>
+              ${company ? `<p style="color: #a1a1aa; margin: 8px 0;"><strong>Company:</strong> ${company}</p>` : ''}
+              <p style="color: #a1a1aa; margin: 8px 0;"><strong>Subject:</strong> ${subject}</p>
+            </div>
+
+            <div style="background-color: #262626; border-radius: 8px; padding: 20px; margin: 20px 0;">
+              <h2 style="color: #fafafa; font-size: 18px; margin-bottom: 15px;">Message</h2>
+              <p style="color: #a1a1aa; line-height: 1.6; white-space: pre-wrap;">${message}</p>
+            </div>
+
+            <p style="color: #71717a; font-size: 14px; margin-top: 30px;">
+              Reply to this email to respond to ${firstName}.
+            </p>
           </div>
         </body>
       </html>

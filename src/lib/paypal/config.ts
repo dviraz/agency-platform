@@ -7,6 +7,11 @@ export const PAYPAL_API_URL =
     ? 'https://api-m.paypal.com'
     : 'https://api-m.sandbox.paypal.com'
 
+/**
+ * Get PayPal OAuth access token for API requests
+ * @returns Access token string for authenticating PayPal API requests
+ * @throws Error if authentication fails
+ */
 export async function getPayPalAccessToken(): Promise<string> {
   const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64')
 
@@ -28,6 +33,14 @@ export async function getPayPalAccessToken(): Promise<string> {
   return data.access_token
 }
 
+/**
+ * Create a PayPal order for checkout
+ * @param amount - Total amount in USD
+ * @param description - Order description shown to customer
+ * @param customId - Custom ID to track this order in our system
+ * @returns PayPal order object with id and other details
+ * @throws Error if order creation fails
+ */
 export async function createPayPalOrder(amount: number, description: string, customId: string) {
   const accessToken = await getPayPalAccessToken()
 
@@ -68,6 +81,13 @@ export async function createPayPalOrder(amount: number, description: string, cus
   return data
 }
 
+/**
+ * Capture payment for a PayPal order
+ * Call this after user approves payment to actually capture the funds
+ * @param orderId - PayPal order ID to capture
+ * @returns PayPal capture data including status and details
+ * @throws Error if capture fails
+ */
 export async function capturePayPalOrder(orderId: string) {
   const accessToken = await getPayPalAccessToken()
 
@@ -89,8 +109,13 @@ export async function capturePayPalOrder(orderId: string) {
 }
 
 /**
- * Verify PayPal webhook signature
- * See: https://developer.paypal.com/api/rest/webhooks/
+ * Verify PayPal webhook signature to ensure authenticity
+ * This prevents unauthorized webhook events from being processed
+ * @param webhookId - PayPal webhook ID from environment
+ * @param headers - Webhook headers containing signature information
+ * @param webhookEventBody - Raw webhook event body as string
+ * @returns true if signature is valid, false otherwise
+ * @see https://developer.paypal.com/api/rest/webhooks/
  */
 export async function verifyWebhookSignature(
   webhookId: string,
@@ -125,7 +150,6 @@ export async function verifyWebhookSignature(
   const data = await response.json()
 
   if (!response.ok) {
-    console.error('Webhook verification failed:', data)
     return false
   }
 

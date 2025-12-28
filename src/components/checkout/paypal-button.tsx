@@ -99,8 +99,7 @@ export function PayPalButton({ productSlug, addonSlugs = [], guestEmail, onSucce
         }}
         createOrder={createOrder}
         onApprove={onApprove}
-        onError={(err) => {
-          console.error('PayPal error:', err)
+        onError={() => {
           toast.error('Payment failed. Please try again.')
         }}
         onCancel={() => {

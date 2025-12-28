@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendEmail, getPaymentConfirmationEmail } from '@/lib/email';
 import { verifyWebhookSignature } from '@/lib/paypal/config';
+import crypto from 'crypto';
 
 // Use service role key for admin operations
 const supabaseAdmin = createClient(
@@ -27,8 +28,6 @@ export async function POST(request: NextRequest) {
     const body = JSON.parse(rawBody);
     const eventType = body.event_type;
 
-    console.log('PayPal webhook received:', eventType);
-
     // Verify webhook signature in production
     if (PAYPAL_WEBHOOK_ID) {
       const transmissionId = request.headers.get('paypal-transmission-id');
@@ -38,7 +37,6 @@ export async function POST(request: NextRequest) {
       const transmissionSig = request.headers.get('paypal-transmission-sig');
 
       if (!transmissionId || !transmissionTime || !certUrl || !authAlgo || !transmissionSig) {
-        console.error('Missing PayPal webhook headers');
         return NextResponse.json({ error: 'Missing webhook headers' }, { status: 401 });
       }
 
@@ -55,13 +53,8 @@ export async function POST(request: NextRequest) {
       );
 
       if (!isValid) {
-        console.error('Invalid PayPal webhook signature');
         return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
       }
-
-      console.log('PayPal webhook signature verified');
-    } else {
-      console.warn('PAYPAL_WEBHOOK_ID not set - skipping signature verification (development only)');
     }
 
     // Handle payment capture completed event
@@ -71,10 +64,7 @@ export async function POST(request: NextRequest) {
       const amount = body.resource.amount.value;
       const currency = body.resource.amount.currency_code;
 
-      console.log('Payment captured:', { captureId, orderId, amount, currency });
-
       if (!orderId) {
-        console.error('No order ID in webhook payload');
         return NextResponse.json({ error: 'No order ID' }, { status: 400 });
       }
 
@@ -86,7 +76,6 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (orderError || !order) {
-        console.error('Order not found:', orderError);
         return NextResponse.json({ error: 'Order not found' }, { status: 404 });
       }
 
@@ -96,7 +85,12 @@ export async function POST(request: NextRequest) {
 
       if (!userId && order.metadata?.guestEmail) {
         const guestEmail = order.metadata.guestEmail;
-        console.log('Guest checkout detected, creating account for:', guestEmail);
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(guestEmail)) {
+          return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
+        }
 
         // Check if user with this email already exists
         const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers();
@@ -104,22 +98,18 @@ export async function POST(request: NextRequest) {
 
         if (userExists) {
           userId = userExists.id;
-          console.log('Found existing user:', userId);
         } else {
-          // Create a new user account
-          const tempPassword = Math.random().toString(36).slice(-12) + 'Aa1!';
+          // Create a new user account with crypto-secure random password
+          const tempPassword = crypto.randomBytes(16).toString('base64') + 'Aa1!';
           const { data: newUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
             email: guestEmail,
             password: tempPassword,
             email_confirm: true, // Auto-confirm email
           });
 
-          if (createUserError) {
-            console.error('Failed to create user:', createUserError);
-          } else if (newUser.user) {
+          if (!createUserError && newUser.user) {
             userId = newUser.user.id;
             userEmail = guestEmail;
-            console.log('Created new user:', userId);
 
             // Create profile
             await supabaseAdmin.from('profiles').insert({
@@ -143,7 +133,6 @@ export async function POST(request: NextRequest) {
 
       // Check if already processed (idempotency)
       if (order.status === 'payment_completed' || order.paypal_capture_id) {
-        console.log('Order already processed, skipping');
         return NextResponse.json({ message: 'Already processed' }, { status: 200 });
       }
 
@@ -160,7 +149,6 @@ export async function POST(request: NextRequest) {
         .eq('id', order.id);
 
       if (updateError) {
-        console.error('Failed to update order:', updateError);
         return NextResponse.json({ error: 'Update failed' }, { status: 500 });
       }
 
@@ -172,7 +160,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (!existingIntake && userId) {
-        const { error: intakeError } = await supabaseAdmin
+        await supabaseAdmin
           .from('intake_forms')
           .insert({
             order_id: order.id,
@@ -183,12 +171,6 @@ export async function POST(request: NextRequest) {
             current_step: 1,
             is_completed: false,
           });
-
-        if (intakeError) {
-          console.error('Failed to create intake form:', intakeError);
-        } else {
-          console.log('Intake form created for order:', order.id);
-        }
       }
 
       // Send payment confirmation email
@@ -207,11 +189,8 @@ export async function POST(request: NextRequest) {
             subject: emailContent.subject,
             html: emailContent.html,
           });
-
-          console.log('Payment confirmation email sent to:', recipientEmail);
         }
-      } catch (emailError) {
-        console.error('Failed to send email:', emailError);
+      } catch {
         // Don't fail the webhook if email fails
       }
 
@@ -222,11 +201,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle other webhook events (optional)
-    console.log('Unhandled webhook event type:', eventType);
     return NextResponse.json({ message: 'Event received' }, { status: 200 });
 
-  } catch (error) {
-    console.error('Webhook error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }

@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Profile, Project } from '@/types/database'
+import { Profile, Project, ProjectStatus } from '@/types/database'
 
 const projectStatuses = [
   'not_started',
@@ -43,9 +43,8 @@ async function updateProject(formData: FormData) {
 
   await supabase
     .from('projects')
-    // @ts-expect-error - Supabase type inference issue
     .update({
-      status,
+      status: status as ProjectStatus,
       progress_percentage: progress,
       updated_at: new Date().toISOString(),
     })
@@ -54,12 +53,11 @@ async function updateProject(formData: FormData) {
   if (updateTitle) {
     await supabase
       .from('project_updates')
-      // @ts-expect-error - Supabase type inference issue
       .insert({
         project_id: projectId,
         title: updateTitle,
         description: updateDescription || null,
-        update_type: 'general',
+        update_type: 'general' as const,
         created_by_admin: true,
       })
   }
@@ -75,16 +73,14 @@ export default async function AdminProjectsPage() {
     .select('id, project_name, status, progress_percentage, user_id, created_at')
     .order('created_at', { ascending: false })
 
-  // @ts-expect-error - Supabase type inference issue
-  const userIds = Array.from(new Set((projects || []).map((project) => project.user_id)))
+  const userIds = Array.from(new Set((projects || []).map((project) => project.user_id).filter((id): id is string => id != null)))
   const { data: profiles } = await supabase
     .from('profiles')
     .select('id, full_name, email')
     .in('id', userIds.length ? userIds : ['00000000-0000-0000-0000-000000000000'])
 
   const profileMap = new Map<string, Partial<Profile>>(
-    // @ts-expect-error - Supabase type inference issue
-    (profiles || []).map((profile) => [profile.id, profile])
+    (profiles || []).map((profile) => [profile.id as string, profile])
   )
 
   return (

@@ -7,6 +7,17 @@
 
 import { GoogleAnalytics as GA } from '@next/third-parties/google'
 
+// Extend Window interface for gtag
+declare global {
+  interface Window {
+    gtag?: (
+      command: 'config' | 'event' | 'set',
+      targetId: string,
+      config?: Record<string, unknown>
+    ) => void
+  }
+}
+
 export function GoogleAnalytics() {
   const gaId = process.env.NEXT_PUBLIC_GA_ID
 
@@ -23,9 +34,9 @@ export function GoogleAnalytics() {
  * @param eventName - The name of the event
  * @param params - Additional parameters for the event
  */
-export function sendGAEvent(eventName: string, params?: Record<string, any>) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', eventName, params)
+export function sendGAEvent(eventName: string, params?: Record<string, unknown>) {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', eventName, params)
   }
 }
 

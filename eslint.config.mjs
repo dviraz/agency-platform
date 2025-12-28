@@ -13,6 +13,19 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // Warn about console statements in production code
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      // Restrict use of the 'any' type
+      '@typescript-eslint/no-explicit-any': 'warn',
+      // Warn about unused variables
+      '@typescript-eslint/no-unused-vars': ['warn', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_'
+      }],
+    }
+  }
 ]);
 
 export default eslintConfig;

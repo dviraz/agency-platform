@@ -87,7 +87,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (orderError) {
-      console.error('Order creation error:', orderError)
       return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
     }
 
@@ -112,7 +111,6 @@ export async function POST(request: NextRequest) {
       paypalOrderId: paypalOrder.id,
     })
   } catch (error: unknown) {
-    console.error('Create order error:', error)
     const message = error instanceof Error ? error.message : 'Internal server error'
     return NextResponse.json(
       { error: message },

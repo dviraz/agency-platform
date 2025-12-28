@@ -122,12 +122,8 @@ export async function POST(request: NextRequest) {
       })
       .eq('id', orderId)
 
-    if (updateError) {
-      console.error('Order update error:', updateError)
-    }
-
     // Create intake form for the order
-    const { error: intakeError } = await supabase
+    await supabase
       .from('intake_forms')
       .insert({
         order_id: orderId,
@@ -135,10 +131,6 @@ export async function POST(request: NextRequest) {
         current_step: 1,
         is_completed: false,
       })
-
-    if (intakeError) {
-      console.error('Intake form creation error:', intakeError)
-    }
 
     // Send confirmation email
     try {
@@ -162,8 +154,7 @@ export async function POST(request: NextRequest) {
           html: emailContent.html,
         })
       }
-    } catch (emailError) {
-      console.error('Email sending error:', emailError)
+    } catch {
       // Don't fail the request if email fails
     }
 
@@ -173,7 +164,6 @@ export async function POST(request: NextRequest) {
       captureId: captureData.purchase_units?.[0]?.payments?.captures?.[0]?.id,
     })
   } catch (error: unknown) {
-    console.error('Capture order error:', error)
     const message = error instanceof Error ? error.message : 'Internal server error'
     return NextResponse.json(
       { error: message },

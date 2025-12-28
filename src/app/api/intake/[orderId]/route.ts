@@ -79,8 +79,7 @@ export async function GET(
     }
 
     return NextResponse.json({ data });
-  } catch (error) {
-    console.error('Error fetching intake form:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -128,7 +127,6 @@ export async function PATCH(
       .single();
 
     if (error) {
-      console.error('Error updating intake form:', error);
       return NextResponse.json(
         { error: 'Failed to update intake form' },
         { status: 500 }
@@ -136,8 +134,7 @@ export async function PATCH(
     }
 
     return NextResponse.json({ data });
-  } catch (error) {
-    console.error('Intake form update error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import { Profile, Order } from '@/types/database'
+import { Profile, Order, OrderStatus } from '@/types/database'
 
 const orderStatuses = [
   'pending',
@@ -38,8 +38,10 @@ async function updateOrderStatus(formData: FormData) {
 
   await supabase
     .from('orders')
-    // @ts-expect-error - Supabase generated types are overly restrictive for dynamic status updates
-    .update({ status, updated_at: new Date().toISOString() })
+    .update({
+      status: status as OrderStatus,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', orderId)
 
   revalidatePath('/admin/orders')
@@ -64,16 +66,14 @@ export default async function AdminOrdersPage({
 
   const { data: orders } = await ordersQuery
 
-  // @ts-expect-error - Supabase type inference issue
-  const userIds = Array.from(new Set((orders || []).map((order) => order.user_id)))
+  const userIds = Array.from(new Set((orders || []).map((order) => order.user_id).filter((id): id is string => id != null)))
   const { data: profiles } = await supabase
     .from('profiles')
     .select('id, full_name, email')
     .in('id', userIds.length ? userIds : ['00000000-0000-0000-0000-000000000000'])
 
   const profileMap = new Map<string, Partial<Profile>>(
-    // @ts-expect-error - Supabase type inference issue
-    (profiles || []).map((profile) => [profile.id, profile])
+    (profiles || []).map((profile) => [profile.id as string, profile])
   )
 
   return (

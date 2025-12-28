@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { OrganizationSchema } from '@/components/seo/structured-data'
 
 const footerNavigation = {
   services: [
@@ -27,7 +28,9 @@ const footerNavigation = {
 
 export function Footer() {
   return (
-    <footer className="bg-card border-t border-white/5">
+    <>
+      <OrganizationSchema />
+      <footer className="bg-card border-t border-white/5">
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           {/* Logo and description */}
@@ -122,5 +125,6 @@ export function Footer() {
         </div>
       </div>
     </footer>
+    </>
   )
 }

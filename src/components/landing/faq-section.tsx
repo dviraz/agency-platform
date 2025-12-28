@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Plus, Minus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { FAQSchema } from '@/components/seo/structured-data'
 
 interface FAQ {
   question: string
@@ -88,9 +89,11 @@ export function FAQSection() {
   }
 
   return (
-    <section className="relative py-24 sm:py-32">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent" />
+    <>
+      <FAQSchema faqs={faqs} />
+      <section className="relative py-24 sm:py-32">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent" />
 
       <div className="relative mx-auto max-w-4xl px-6 lg:px-8">
         {/* Section header */}
@@ -213,5 +216,6 @@ export function FAQSection() {
         </motion.div>
       </div>
     </section>
+    </>
   )
 }

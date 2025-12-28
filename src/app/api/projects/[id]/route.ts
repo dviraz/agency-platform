@@ -59,8 +59,7 @@ export async function GET(
     }
 
     return NextResponse.json({ data });
-  } catch (error) {
-    console.error('Error fetching project:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -103,7 +102,6 @@ export async function PATCH(
       .single();
 
     if (error) {
-      console.error('Error updating project:', error);
       return NextResponse.json(
         { error: 'Failed to update project' },
         { status: 500 }
@@ -111,8 +109,7 @@ export async function PATCH(
     }
 
     return NextResponse.json({ data });
-  } catch (error) {
-    console.error('Project update error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

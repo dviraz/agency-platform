@@ -98,8 +98,8 @@ export function IntakeForm({ orderId, initialData, initialStep = 1 }: IntakeForm
         .eq('order_id', orderId)
 
       if (error) throw error
-    } catch (error) {
-      console.error('Save error:', error)
+    } catch {
+      // Silent fail for auto-save
     } finally {
       setIsSaving(false)
     }
